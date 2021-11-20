@@ -16,7 +16,15 @@ var program;
 var t_vPosition;
 var tBuffer;
 var t_cBuffer;
-var colorC = [0, 0, 1, 1, 0, 0, 0, 1, 0];
+var colorC = [1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+    1.000, 0.388, 0.278,
+];
 var t_ColorLoc;
 var transformation_Matrix;
 var transformation_MatrixLoc;
@@ -26,19 +34,19 @@ var NumPoints = 5000;
 
 
 var indices = [
-    1,0,3,
-    3,2,1,
-    2,3,7,
-    7,6,2,
-    3,0,4,
-    4,7,3,
-    6,5,1,
-    1,2,6,
-    4,5,6,
-    6,7,4,
-    5,4,0,
-    0,1,5
-    ];
+    1, 0, 3,
+    3, 2, 1,
+    2, 3, 7,
+    7, 6, 2,
+    3, 0, 4,
+    4, 7, 3,
+    6, 5, 1,
+    1, 2, 6,
+    4, 5, 6,
+    6, 7, 4,
+    5, 4, 0,
+    0, 1, 5
+];
 
 
 /** */
@@ -52,17 +60,17 @@ var texture;
 
 
 /***Textbook code below */
-function configureTexture( image ) {
+function configureTexture(image) {
     texture = gl.createTexture();
-    gl.bindTexture( gl.TEXTURE_2D, texture );
+    gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGB, 
-         gl.RGB, gl.UNSIGNED_BYTE, image );
-    gl.generateMipmap( gl.TEXTURE_2D );
-    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, 
-                      gl.NEAREST_MIPMAP_LINEAR );
-    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-    
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
+        gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+        gl.NEAREST_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 }
 /****Textbook code ends here */
@@ -88,7 +96,7 @@ window.onload = function init() {
     ];
 
 
-  
+
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
