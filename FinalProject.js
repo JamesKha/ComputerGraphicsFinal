@@ -137,7 +137,7 @@ window.onload = function init() {
 
     //set the default position
     transformation_Matrix = mat4();
-    transformation_MatrixLoc = gl.getUniformLocation(program, "uTransformationMatrix");
+    transformation_MatrixLoc = gl.getUniformLocation(program, "uModelViewMatrix");
     gl.uniformMatrix4fv(transformation_MatrixLoc, false, flatten(transformation_Matrix));
 
 
