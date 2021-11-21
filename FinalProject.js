@@ -302,19 +302,19 @@ window.onload = function init() {
         move = true;
     };
 
-    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),
+    gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"),
        flatten(ambientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),
+    gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"),
        flatten(diffuseProduct) );
-    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), 
+    gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), 
        flatten(specularProduct) );	
-    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), 
+    gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), 
        flatten(lightPosition) );
        
     gl.uniform1f(gl.getUniformLocation(program, 
-       "shininess"),materialShininess);
+       "uShininess"),materialShininess);
     
-    gl.uniformMatrix4fv( gl.getUniformLocation(program, "projectionMatrix"),
+    gl.uniformMatrix4fv( gl.getUniformLocation(program, "uProjectionMatrix"),
        false, flatten(projection));
     
     render();
