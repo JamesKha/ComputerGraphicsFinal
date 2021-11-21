@@ -60,19 +60,19 @@ var texture;
 
 
 /***Textbook code below */
-function configureTexture(image) {
-    texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
-        gl.RGB, gl.UNSIGNED_BYTE, image);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-        gl.NEAREST_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+// function configureTexture(image) {
+//     texture = gl.createTexture();
+//     gl.bindTexture(gl.TEXTURE_2D, texture);
+//     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+//     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
+//         gl.RGB, gl.UNSIGNED_BYTE, image);
+//     gl.generateMipmap(gl.TEXTURE_2D);
+//     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+//         gl.NEAREST_MIPMAP_LINEAR);
+//     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
-}
+//     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+// }
 /****Textbook code ends here */
 window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
@@ -296,7 +296,7 @@ window.onload = function init() {
         move = true;
     };
 
-    // var image = document.getElementById("dogImageTest");
+    // var image = document.getElementById("texImage");
     // configureTexture( image );
     render();
 };
