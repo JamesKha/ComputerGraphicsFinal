@@ -1,5 +1,3 @@
-
-  
 <!-- Name: Jimmy Kha 
 Student Number: 588541 
 CMPT 325: Spring 2021
@@ -108,27 +106,27 @@ Due Date: November 18, 2021 -->
 
 	#version 300 es
 
-in vec4 aPosition;
-in vec4 aColor;
-uniform mat4 uTransformationMatrix;
+	in vec4 aPosition;
+	in vec4 aColor;
+	uniform mat4 uTransformationMatrix;
+	out vec4 vColor; 
+	in vec4 aNormal;
+	uniform vec4 uAmbientProduct, uDiffuseProduct,uSpecularProduct;
+	uniform mat4 uProjectionMatrix;
+	uniform vec4 uLightPosition;
+	uniform float uShininess;
 
 
-out vec4 vColor; 
+	in vec2 a_texcoord;
 
+	out vec2 v_texcoord;
 
-//vertex shader 
-in vec4 aNormal;
-uniform vec4 uAmbientProduct, uDiffuseProduct,uSpecularProduct;
-uniform mat4 uProjectionMatrix;
-uniform vec4 uLightPosition;
-uniform float uShininess;
-
-void main()
-{
-  //gl_Position = aPosition;
-  gl_Position = uTransformationMatrix * aPosition;
-  vColor = aColor;
-}
+	void main()
+	{
+	//gl_Position = aPosition;
+	gl_Position = uTransformationMatrix * aPosition;
+	v_texcoord = a_texcoord;
+	}
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -136,12 +134,12 @@ void main()
 
 precision mediump float;
 
-in vec4 vColor;
-out vec4 fColor;
-
+in vec2 v_texcoord;
+uniform sampler2D u_texture;
+out vec4 outColor;
 void main()
 {
-    fColor = vColor;
+    outColor = texture(u_texture, v_texcoord);
 }
 </script>
 
@@ -150,6 +148,6 @@ void main()
 <script type="text/javascript" src="FinalProject.js"></script>
 
 <canvas id="gl-canvas" width="512" height="512"> </canvas>
-<!-- <img id="dogImageTest" src="DogImage1.png"> -->
+<img id="dogImageTest" src="DogImage1.png">
 
 </html>

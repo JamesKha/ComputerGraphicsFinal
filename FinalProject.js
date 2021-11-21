@@ -96,8 +96,6 @@ window.onload = function init() {
     ];
 
 
-
-
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -134,7 +132,27 @@ window.onload = function init() {
     transformation_MatrixLoc = gl.getUniformLocation(program, "uTransformationMatrix");
     gl.uniformMatrix4fv(transformation_MatrixLoc, false, flatten(transformation_Matrix));
 
+            //Textbook code
+    var texcoordAttributeLocation = gl.getAttribLocation(program, "a_texcoord");
+    var texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0 + 0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+      // Fill the texture with a 1x1 blue pixel.
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+    new Uint8Array([0, 0, 255, 255]));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
+
+    var image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = "DogImage1.png";
+    image.addEventListener('load', function() {
+    // Now that the image has loaded make copy it to the texture.
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    });
+    //Textbook code ends
     //Translation transformations
     var translateTemp = [0, 0, 0]; //This will store all of the temporary values of the past slider value
     document.getElementById("xTranslateSlider").onchange = function (event) {
