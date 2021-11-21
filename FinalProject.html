@@ -4,109 +4,110 @@ CMPT 325: Spring 2021
 Assignment #4-2: Affine Transformations in a WebGL Application
 Due Date: November 18, 2021 -->
 <html>
-<style>
-	#gl-canvas {
-		position: absolute;
-		left: 250px;
-	}
-</style>
-<div>
-	<form>
+  <style>
+		#gl-canvas {
+		  position: absolute;
+		  left: 250px;
+		}
+	  </style>
+	<div>
+		<form>
 		<h3>Translate</h3>
-		-X<input id="xTranslateSlider" type="range" min="-0.5" max="0.5" step="0.1" value="0.0"
-			oninput="this.nextElementSibling.value = this.value">
+		-X<input id="xTranslateSlider" type="range"
+		min="-0.5" max="0.5" step="0.1" value="0.0" oninput="this.nextElementSibling.value = this.value">
 		+X
 		<output for="xTranslateSlider">0.0</output>
 		<br>
-		-Y<input id="yTranslateSlider" type="range" min="-0.5" max="0.5" step="0.1" value="0.0"
-			oninput="this.nextElementSibling.value = this.value">
+		-Y<input id="yTranslateSlider" type="range"
+		min="-0.5" max="0.5" step="0.1" value="0.0" oninput="this.nextElementSibling.value = this.value">
 		+Y
 		<output>0.0</output>
 		<br>
-		-Z<input id="zTranslateSlider" type="range" min="-0.5" max="0.5" step="0.1" value="0.0"
-			oninput="this.nextElementSibling.value = this.value">
+		-Z<input id="zTranslateSlider" type="range"
+		min="-0.5" max="0.5" step="0.1" value="0.0" oninput="this.nextElementSibling.value = this.value">
 		+Z
 		<output>0.0</output>
-</div>
-<div>
-	<h3>Rotate</h3>
-	-X<input id="xRotateSlider" type="range" min="-360" max="360" step="15" value="0"
-		oninput="this.nextElementSibling.value = this.value">
-	+X
-	<output><b>0</b></output>&#176;
-	<br>
-	-Y<input id="yRotateSlider" type="range" min="-360" max="360" step="15" value="0"
-		oninput="this.nextElementSibling.value = this.value">
-	+Y
-	<output><b>0</b></output>&#176;
-	<br>
-	-Z<input id="zRotateSlider" type="range" min="-360" max="360" step="15" value="0"
-		oninput="this.nextElementSibling.value = this.value">
-	+Z
-	<output><b>0</b></output>&#176;
-</div>
-<div>
-	<h3>Scale</h3>
-	-X<input id="xScaleSlider" type="range" min="0" max="2" step="0.1" value="1.0"
-		oninput="this.nextElementSibling.value = this.value">
-	+X
-	<output>1</output>
-	<br>
-	-Y<input id="yScaleSlider" type="range" min="0" max="2" step="0.1" value="1.0"
-		oninput="this.nextElementSibling.value = this.value">
-	+Y
-	<output>1</output>
-	<br>
-	-Z<input id="zScaleSlider" type="range" min="0" max="2" step="0.1" value="1.0"
-		oninput="this.nextElementSibling.value = this.value">
-	+Z
-	<output>1</output>
-</div>
-<div>
-	<h3>Shear</h3>
-	-shearXY
-	<input id="shearXYSlider" type="range" min="-3" max="3" step="0.5" value="0" " oninput="
-		this.nextElementSibling.value=this.value">
-	+shearXY
-	<output><b>0</b></output>
-	<br>
-	-shearXZ<input id="shearXZSlider" type="range" min="-3" max="3" step="0.5" value="0"
-		oninput="this.nextElementSibling.value = this.value">
-	+shearXZ
-	<output><b>0</b></output>
-	<br>
-	-shearYZ<input id="shearYZSlider" type="range" min="-3" max="3" step="0.5" value="0"
-		oninput="this.nextElementSibling.value = this.value">
-	+shearYZ
-	<output><b>0</b></output>
-</div>
+	</div>
+	<div>
+		<h3>Rotate</h3>
+		-X<input id="xRotateSlider" type="range"
+		min="-360" max="360" step="15" value="0"  oninput="this.nextElementSibling.value = this.value">
+		+X
+		<output><b>0</b></output>&#176;
+		<br>
+		-Y<input id="yRotateSlider" type="range"
+		min="-360" max="360" step="15" value="0"  oninput="this.nextElementSibling.value = this.value">
+		+Y
+		<output><b>0</b></output>&#176;
+		<br>
+		-Z<input id="zRotateSlider" type="range"
+		min="-360" max="360" step="15" value="0"  oninput="this.nextElementSibling.value = this.value">
+		+Z
+		<output><b>0</b></output>&#176;
+	</div>
+	<div>
+		<h3>Scale</h3>
+		-X<input id="xScaleSlider" type="range"
+		min="0" max="2" step="0.1" value="1.0" oninput="this.nextElementSibling.value = this.value">
+		+X
+		<output>1</output>
+		<br>
+		-Y<input id="yScaleSlider" type="range"
+		min="0" max="2"  step="0.1" value="1.0"oninput="this.nextElementSibling.value = this.value">
+		+Y
+		<output>1</output>
+		<br>
+		-Z<input id="zScaleSlider" type="range"
+		min="0" max="2"  step="0.1" value="1.0" oninput="this.nextElementSibling.value = this.value">
+		+Z
+		<output>1</output>
+	</div>
+	<div>
+		<h3>Shear</h3>
+		-shearXY
+		<input id="shearXYSlider" type="range"
+		min="-3" max="3"  step="0.5" value="0" " oninput="this.nextElementSibling.value = this.value">
+		+shearXY
+		<output><b>0</b></output>
+		<br>
+		-shearXZ<input id="shearXZSlider" type="range"
+		min="-3" max="3"  step="0.5" value="0" oninput="this.nextElementSibling.value = this.value">
+		+shearXZ
+		<output><b>0</b></output>
+		<br>
+		-shearYZ<input id="shearYZSlider" type="range"
+		min="-3" max="3"  step="0.5" value="0"oninput="this.nextElementSibling.value = this.value">
+		+shearYZ
+		<output><b>0</b></output>
+	</div>
 
 
-<div>
-	<h3>Reflection</h3>
-	<button type="button" id="ReflectionX">ReflectionX</button>
+
+	<div>
+		<h3>Reflection</h3>
+		<button type="button" id="ReflectionX">ReflectionX</button> 
+		<br>
+		<button type="button" id="ReflectionY">ReflectionY</button> 
+		<br>
+		<button type="button" id="ReflectionZ">ReflectionZ</button> 
+	</div>
+
+	
 	<br>
-	<button type="button" id="ReflectionY">ReflectionY</button>
+	<button type="button" id="ScaleRotate">Scale 0.2+x & Rotate 45-Y</button> 
 	<br>
-	<button type="button" id="ReflectionZ">ReflectionZ</button>
-</div>
-
-
-<br>
-<button type="button" id="ScaleRotate">Scale 0.2+x & Rotate 45-Y</button>
-<br>
-<button type="button" id="RotateScale">Rotate 45-Y & Scale 0.2+x </button>
-<br>
-<button type="reset" id="resetButton">Reset</button>
-
+	<button type="button" id="RotateScale">Rotate 45-Y & Scale 0.2+x </button> 
+	<br>
+	<button type="reset" id="resetButton">Reset</button> 
+	
 </form>
-
 </html>
 <script id="vertex-shader" type="x-shader/x-vertex">
-
-	#version 300 es
+	
+#version 300 es
 
 in vec4 aPosition;
+<<<<<<< HEAD
 in vec4 aNormal;
 out vec4 vColor;
 uniform mat4 uModelViewMatrix;
@@ -117,6 +118,13 @@ uniform vec4 uAmbientProduct, uDiffuseProduct,uSpecularProduct;
 uniform mat4 uProjectionMatrix;
 uniform vec4 uLightPosition;
 uniform float uShininess;
+=======
+in vec4 aColor;
+uniform mat4 uTransformationMatrix;
+
+
+out vec4 vColor; 
+>>>>>>> parent of ba800ab (Changes to HTML)
 
 void main()
 {
@@ -151,7 +159,7 @@ void main()
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
-	#version 300 es
+#version 300 es
 
 precision mediump float;
 
@@ -170,5 +178,4 @@ void main()
 
 <canvas id="gl-canvas" width="512" height="512"> </canvas>
 <!-- <img id="dogImageTest" src="DogImage1.png"> -->
-
 </html>
