@@ -26,7 +26,7 @@ var colorC = [1.000, 0.388, 0.278,
     1.000, 0.388, 0.278,
 ];
 var t_ColorLoc;
-var transformation_Matrix;
+var transformation_Matrix, projection;
 var transformation_MatrixLoc;
 var move = true;
 
@@ -60,19 +60,16 @@ var texture;
 
 
 /***Textbook code below */
-function configureTexture(image) {
-    texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
-        gl.RGB, gl.UNSIGNED_BYTE, image);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-        gl.NEAREST_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+var viewerPos;
+var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
+var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
-    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
-}
+var materialAmbient = vec4( 1.0, 0.0, 1.0, 1.0 );
+var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0);
+var materialSpecular = vec4( 1.0, 0.8, 0.0, 1.0 );
+var materialShininess = 100.0;
 /****Textbook code ends here */
 window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
@@ -109,13 +106,13 @@ window.onload = function init() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
     t_vPosition = gl.getAttribLocation(program, "aPosition");
-    gl.vertexAttribPointer(t_vPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(t_vPosition, 4, gl.FLOAT, false, 0, 0);
 
     t_cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, t_cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorC), gl.STATIC_DRAW);
 
-    t_ColorLoc = gl.getAttribLocation(program, "aColor");
+    t_ColorLoc = gl.getAttribLocation(program, "aNormal");
     gl.vertexAttribPointer(t_ColorLoc, 3, gl.FLOAT, false, 0, 0);
 
     var iBuffer = gl.createBuffer();
@@ -128,6 +125,15 @@ window.onload = function init() {
 
     gl.enableVertexAttribArray(t_ColorLoc);
 
+
+
+    viewerPos = vec3(0.0, 0.0, -20.0 );
+
+    projection = ortho(-1, 1, -1, 1, -100, 100);
+    
+    var ambientProduct = mult(lightAmbient, materialAmbient);
+    var diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    var specularProduct = mult(lightSpecular, materialSpecular);
 
     //set the default position
     transformation_Matrix = mat4();
@@ -296,8 +302,21 @@ window.onload = function init() {
         move = true;
     };
 
-    // var image = document.getElementById("dogImageTest");
-    // configureTexture( image );
+    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),
+       flatten(ambientProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),
+       flatten(diffuseProduct) );
+    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), 
+       flatten(specularProduct) );	
+    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), 
+       flatten(lightPosition) );
+       
+    gl.uniform1f(gl.getUniformLocation(program, 
+       "shininess"),materialShininess);
+    
+    gl.uniformMatrix4fv( gl.getUniformLocation(program, "projectionMatrix"),
+       false, flatten(projection));
+    
     render();
 };
 
