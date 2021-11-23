@@ -25,7 +25,7 @@ var colorC = [1.000, 0.388, 0.278,
     1.000, 0.388, 0.278,
     1.000, 0.388, 0.278,
 ];
-var t_ColorLoc;
+var v_Normal;
 var modelView_Matrix;
 var modelView_MatrixLoc;
 var move = true;
@@ -123,8 +123,8 @@ window.onload = function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, t_cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorC), gl.STATIC_DRAW);
 
-    t_ColorLoc = gl.getAttribLocation(program, "aNormal");
-    gl.vertexAttribPointer(t_ColorLoc, 3, gl.FLOAT, false, 0, 0);
+    v_Normal = gl.getAttribLocation(program, "aNormal");
+    gl.vertexAttribPointer(v_Normal, 3, gl.FLOAT, false, 0, 0);
 
     var iBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
@@ -134,7 +134,7 @@ window.onload = function init() {
     gl.useProgram(program);
     gl.enableVertexAttribArray(t_vPosition);
 
-    gl.enableVertexAttribArray(t_ColorLoc);
+    gl.enableVertexAttribArray(v_Normal);
 
 
     //set the default position
