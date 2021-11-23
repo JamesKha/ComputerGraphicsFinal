@@ -26,8 +26,8 @@ var colorC = [1.000, 0.388, 0.278,
     1.000, 0.388, 0.278,
 ];
 var t_ColorLoc;
-var transformation_Matrix;
-var transformation_MatrixLoc;
+var modelView_Matrix;
+var modelView_MatrixLoc;
 var move = true;
 
 var NumPoints = 5000;
@@ -60,19 +60,20 @@ var texture;
 
 
 /***Textbook code below */
-function configureTexture(image) {
-    texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
-        gl.RGB, gl.UNSIGNED_BYTE, image);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-        gl.NEAREST_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+var uLightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
+var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
-    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
-}
+var materialAmbient = vec4( 1.0, 0.0, 1.0, 1.0 );
+var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0);
+var materialSpecular = vec4( 1.0, 0.8, 0.0, 1.0 );
+var materialShininess = 100.0;
+
+var ctm;
+var ambientColor, diffuseColor, specularColor;
+var modelView, projection;
+var viewerPos;
 /****Textbook code ends here */
 window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
@@ -103,6 +104,13 @@ window.onload = function init() {
     gl.enable(gl.DEPTH_TEST);
 
     program = initShaders(gl, "vertex-shader", "fragment-shader");
+    viewerPos = vec3(0.0, 0.0,-20.0);
+
+    projection = ortho(-1, 1, -1, 1, -100, 100);
+
+    var uAmbientProduct = mult(lightAmbient, materialAmbient);
+    var uDiffuseProduct = mult(lightDiffuse, materialDiffuse);
+    var uSpecularProduct = mult(lightSpecular, materialSpecular);
 
     tBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
@@ -115,7 +123,7 @@ window.onload = function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, t_cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorC), gl.STATIC_DRAW);
 
-    t_ColorLoc = gl.getAttribLocation(program, "aColor");
+    t_ColorLoc = gl.getAttribLocation(program, "aNormal");
     gl.vertexAttribPointer(t_ColorLoc, 3, gl.FLOAT, false, 0, 0);
 
     var iBuffer = gl.createBuffer();
@@ -130,30 +138,30 @@ window.onload = function init() {
 
 
     //set the default position
-    transformation_Matrix = mat4();
-    transformation_MatrixLoc = gl.getUniformLocation(program, "uTransformationMatrix");
-    gl.uniformMatrix4fv(transformation_MatrixLoc, false, flatten(transformation_Matrix));
+    modelView_Matrix = mat4();
+    modelView_MatrixLoc = gl.getUniformLocation(program, "uModelViewMatrix");
+    gl.uniformMatrix4fv(modelView_MatrixLoc, false, flatten(modelView_Matrix));
 
 
     //Translation transformations
     var translateTemp = [0, 0, 0]; //This will store all of the temporary values of the past slider value
     document.getElementById("xTranslateSlider").onchange = function (event) {
         var change = event.target.value - translateTemp[0];
-        transformation_Matrix = mult(transformation_Matrix, translate(change, 0, 0));
+        modelView_Matrix = mult(modelView_Matrix, translate(change, 0, 0));
         move = true;
         translateTemp[0] = event.target.value;
     };
 
     document.getElementById("yTranslateSlider").onchange = function (event) {
         var change = event.target.value - translateTemp[1];
-        transformation_Matrix = mult(transformation_Matrix, translate(0, change, 0));
+        modelView_Matrix = mult(modelView_Matrix, translate(0, change, 0));
         move = true;
         translateTemp[1] = event.target.value;
     };
 
     document.getElementById("zTranslateSlider").onchange = function (event) {
         var change = event.target.value - translateTemp[2];
-        transformation_Matrix = mult(transformation_Matrix, translate(0, 0, change));
+        modelView_Matrix = mult(modelView_Matrix, translate(0, 0, change));
         move = true;
         translateTemp[2] = event.target.value;
     };
@@ -164,21 +172,21 @@ window.onload = function init() {
     var rotateTemp = [0, 0, 0]; //This will store all of the temporary values of the past slider value
     document.getElementById("xRotateSlider").onchange = function (event) {
         var change = event.target.value - rotateTemp[0];
-        transformation_Matrix = mult(transformation_Matrix, rotate(change, 1.0, 0.0, 0.0));
+        modelView_Matrix = mult(modelView_Matrix, rotate(change, 1.0, 0.0, 0.0));
         move = true;
         rotateTemp[0] = event.target.value;
     };
 
     document.getElementById("yRotateSlider").onchange = function (event) {
         var change = event.target.value - rotateTemp[1];
-        transformation_Matrix = mult(transformation_Matrix, rotate(change, 0.0, 1.0, 0.0));
+        modelView_Matrix = mult(modelView_Matrix, rotate(change, 0.0, 1.0, 0.0));
         move = true;
         rotateTemp[1] = event.target.value;
     };
 
     document.getElementById("zRotateSlider").onchange = function (event) {
         var change = event.target.value - rotateTemp[2];
-        transformation_Matrix = mult(transformation_Matrix, rotate(change, 0.0, 0.0, 1.0));
+        modelView_Matrix = mult(modelView_Matrix, rotate(change, 0.0, 0.0, 1.0));
         move = true;
         rotateTemp[2] = event.target.value;
     };
@@ -188,20 +196,20 @@ window.onload = function init() {
     var scaleTemp = [1.0, 1.0, 1.0]; //This will store all of the temporary values of the past slider value
     document.getElementById("xScaleSlider").onchange = function (event) {
         var change = event.target.value - scaleTemp[0] + 1.0;
-        transformation_Matrix = mult(transformation_Matrix, scale(change, 1, 1));
+        modelView_Matrix = mult(modelView_Matrix, scale(change, 1, 1));
         move = true;
         scaleTemp[0] = event.target.value;
     };
 
     document.getElementById("yScaleSlider").onchange = function (event) {
         var change = event.target.value - scaleTemp[1] + 1.0;
-        transformation_Matrix = mult(transformation_Matrix, scale(1, change, 1));
+        modelView_Matrix = mult(modelView_Matrix, scale(1, change, 1));
         move = true;
         scaleTemp[1] = event.target.value;
     };
     document.getElementById("zScaleSlider").onchange = function (event) {
         var change = event.target.value - scaleTemp[2] + 1.0;
-        transformation_Matrix = mult(transformation_Matrix, scale(1, 1, change));
+        modelView_Matrix = mult(modelView_Matrix, scale(1, 1, change));
         move = true;
         scaleTemp[2] = event.target.value;
     };
@@ -211,7 +219,7 @@ window.onload = function init() {
 
     document.getElementById("shearXYSlider").onchange = function (event) {
         var change = event.target.value - shearTemp[0];
-        transformation_Matrix = mult(transformation_Matrix, shearXY(change, change));
+        modelView_Matrix = mult(modelView_Matrix, shearXY(change, change));
         move = true;
         shearTemp[0] = event.target.value;
     };
@@ -220,7 +228,7 @@ window.onload = function init() {
 
     document.getElementById("shearXZSlider").onchange = function (event) {
         var change = event.target.value - shearTemp[1];
-        transformation_Matrix = mult(transformation_Matrix, shearXZ(change, change));
+        modelView_Matrix = mult(modelView_Matrix, shearXZ(change, change));
         shearTemp[1] = event.target.value;
         move = true;
     };
@@ -228,7 +236,7 @@ window.onload = function init() {
 
     document.getElementById("shearYZSlider").onchange = function (event) {
         var change = event.target.value - shearTemp[2];
-        transformation_Matrix = mult(transformation_Matrix, shearYZ(change, change));
+        modelView_Matrix = mult(modelView_Matrix, shearYZ(change, change));
         shearTemp[2] = event.target.value;
         move = true;
     };
@@ -236,18 +244,18 @@ window.onload = function init() {
     //Reflection transformations
 
     document.getElementById("ReflectionX").onclick = function () {
-        transformation_Matrix = mult(transformation_Matrix, reflection(-1, 1, 1));
+        modelView_Matrix = mult(modelView_Matrix, reflection(-1, 1, 1));
         move = true;
     }
 
     document.getElementById("ReflectionY").onclick = function () {
 
-        transformation_Matrix = mult(transformation_Matrix, reflection(1, -1, 1));
+        modelView_Matrix = mult(modelView_Matrix, reflection(1, -1, 1));
         move = true;
     }
 
     document.getElementById("ReflectionZ").onclick = function () {
-        transformation_Matrix = mult(transformation_Matrix, reflection(1, 1, -1));
+        modelView_Matrix = mult(modelView_Matrix, reflection(1, 1, -1));
         move = true;
     }
 
@@ -258,18 +266,18 @@ window.onload = function init() {
 
     document.getElementById("ScaleRotate").onclick = function () { //Scale and then the rotation
         document.getElementById("xScaleSlider").value = 0.2;
-        transformation_Matrix = mult(transformation_Matrix, scale(0.2, 1, 1));
+        modelView_Matrix = mult(modelView_Matrix, scale(0.2, 1, 1));
         document.getElementById("yRotateSlider").value = -45;
-        transformation_Matrix = mult(transformation_Matrix, rotate(-45, 0.0, 1.0, 0.0));
+        modelView_Matrix = mult(modelView_Matrix, rotate(-45, 0.0, 1.0, 0.0));
         move = true;
     }
 
 
     document.getElementById("RotateScale").onclick = function () { //Rotation then the scale
         document.getElementById("yRotateSlider").value = -45;
-        transformation_Matrix = mult(transformation_Matrix, rotate(-45, 0.0, 1.0, 0.0));
+        modelView_Matrix = mult(modelView_Matrix, rotate(-45, 0.0, 1.0, 0.0));
         document.getElementById("xScaleSlider").value = 0.2;
-        transformation_Matrix = mult(transformation_Matrix, scale(0.2, 1, 1));
+        modelView_Matrix = mult(modelView_Matrix, scale(0.2, 1, 1));
         move = true;
     }
 
@@ -292,9 +300,26 @@ window.onload = function init() {
 
 
 
-        transformation_Matrix = mat4();
+        modelView_Matrix = mat4();
         move = true;
     };
+
+    gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"),
+        flatten(uAmbientProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"),
+        flatten(uDiffuseProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"),
+        flatten(uSpecularProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"),
+        flatten(uLightPosition));
+
+    gl.uniform1f(gl.getUniformLocation(program,
+        "uShininess"), materialShininess);
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "uProjectionMatrix"),
+        false, flatten(projection));
+
+
 
     // var image = document.getElementById("dogImageTest");
     // configureTexture( image );
@@ -305,7 +330,7 @@ window.onload = function init() {
 function render() { //Rendering of the tetrahedron on the canvas
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     if (move == true) {
-        gl.uniformMatrix4fv(transformation_MatrixLoc, false, flatten(transformation_Matrix));
+        gl.uniformMatrix4fv(modelView_MatrixLoc, false, flatten(modelView_Matrix));
         move = false;
     }
 
