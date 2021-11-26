@@ -1,340 +1,420 @@
-/***
- * 
-Name: Jimmy Kha 
-Student Number: 588541 
-CMPT 325: Spring 2021
-Assignment #4-2: Affine Transformations in a WebGL Application
-Due Date: November 18, 2021
- * 
- */
-
-
 "use strict";
 
+var Projection_Lighting_Shading = function() {
+var canvas;
 var gl;
-var program;
-var t_vPosition;
-var tBuffer;
-var t_cBuffer;
-var colorC = [1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-    1.000, 0.388, 0.278,
-];
-var v_Normal;
-var modelView_Matrix;
-var modelView_MatrixLoc;
-var move = true;
 
-var NumPoints = 5000;
+var numPositions = 36;
 
+var positionsArray = [];
+var normalsArray = [];
 
-var indices = [
-    1, 0, 3,
-    3, 2, 1,
-    2, 3, 7,
-    7, 6, 2,
-    3, 0, 4,
-    4, 7, 3,
-    6, 5, 1,
-    1, 2, 6,
-    4, 5, 6,
-    6, 7, 4,
-    5, 4, 0,
-    0, 1, 5
-];
-
-
-/** */
-var xAxis = 0;
-var yAxis = 1;
-var zAxis = 2;
-var axis = 0;
-var theta = [0, 0, 0];
-var thetaLoc;
-var texture;
-
-
-/***Textbook code below */
-var uLightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
-var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0 );
-var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
-var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
-
-var materialAmbient = vec4( 1.0, 0.0, 1.0, 1.0 );
-var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0);
-var materialSpecular = vec4( 1.0, 0.8, 0.0, 1.0 );
-var materialShininess = 100.0;
-
-var ctm;
-var ambientColor, diffuseColor, specularColor;
-var modelView, projection;
-var viewerPos;
-/****Textbook code ends here */
-window.onload = function init() {
-    var canvas = document.getElementById("gl-canvas");
-
-    gl = canvas.getContext('webgl2');
-    if (!gl) {
-        alert("WebGL 2.0 isn't available");
-    }
-
-
-
-    var vertices = [
-        -0.5, -0.5, 0.5,
-        -0.5, 0.5, 0.5,
-        0.5, 0.5, 0.5,
-        0.5, -0.5, 0.5,
-        -0.5, -0.5, -0.5,
-        -0.5, 0.5, -0.5,
-        0.5, 0.5, -0.5,
-        0.5, -0.5, -0.5,
+//
+var vertices = [
+        vec4(-0.5, -0.5,  0.5, 1.0),
+        vec4(-0.5,  0.5,  0.5, 1.0),
+        vec4(0.5,  0.5,  0.5, 1.0),
+        vec4(0.5, -0.5,  0.5, 1.0),
+        vec4(-0.5, -0.5, -0.5, 1.0),
+        vec4(-0.5,  0.5, -0.5, 1.0),
+        vec4(0.5,  0.5, -0.5, 1.0),
+        vec4(0.5, -0.5, -0.5, 1.0)
     ];
 
+//default lighting 
+var lightPosition = vec4(1.0,1.0,3.0, 0.0);
+var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
+var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
+var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
+
+//default material
+var materialAmbient = vec4(1.0, 0.0, 1.0, 1.0);
+var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
+var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
+var materialShininess = 10.0;
 
 
+//store location of attribute of html
+var modelViewMatrix, projectionMatrix;
+var modelViewMatrixLoc, projectionMatrixLoc;
+var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc, materialShininessLoc;
+
+var program;
+
+var viewerPos;
+
+function quad(a, b, c, d) {
+
+     var t1 = subtract(vertices[b], vertices[a]);
+     var t2 = subtract(vertices[c], vertices[b]);
+     var normal = cross(t1, t2);
+     normal = vec3(normal);
+
+
+     positionsArray.push(vertices[a]);
+     normalsArray.push(normal);
+     positionsArray.push(vertices[b]);
+     normalsArray.push(normal);
+     positionsArray.push(vertices[c]);
+     normalsArray.push(normal);
+     positionsArray.push(vertices[a]);
+     normalsArray.push(normal);
+     positionsArray.push(vertices[c]);
+     normalsArray.push(normal);
+     positionsArray.push(vertices[d]);
+     normalsArray.push(normal);
+}
+
+
+function colorCube()
+{
+    quad(1, 0, 3, 2);
+    quad(2, 3, 7, 6);
+    quad(3, 0, 4, 7);
+    quad(6, 5, 1, 2);
+    quad(4, 5, 6, 7);
+    quad(5, 4, 0, 1);
+}
+
+//data of eye
+var radius = 2.0;
+var theta = 18;
+var phi = 0;
+
+
+//data of View
+var eye;
+const at = vec3(0.0, 0.0, 0.0);
+const up = vec3(0.0, 1, 0.0);
+
+//data of perspective projection
+var  fovy = 70.0;  // Field-of-view in Y direction angle (in degrees)
+var  aspect = 1.0;       // Viewport aspect ratio
+var near = 0.3;
+var far = 3.0;
+
+//scale 
+var x_cube=1;
+var y_cube=1;
+var z_cube=1;
+
+//element coordinate
+var coord=[0,0,0]
+
+//light ambient intensity
+var intensity=0.2;
+
+//light on state
+var light=true;
+
+//project model state
+var projection=1;
+
+//light color 
+var lightc=[1,1,1];
+
+//light ambient color
+var light_a = [1,1,1];
+
+//percentage of the light color data
+var light_d=1;
+var light_s=1;
+
+//position of light
+var light_coord=[1,1,3];
+
+//scale data
+var cube_size= 1;
+
+
+//rotate data
+var xAxis = 0;
+    var yAxis = 1;
+    var zAxis = 2;
+    var axis = 0;
+    var r_theta = vec3(0, 0, 0);
+var flag = false;
+
+var rotate_v = [0,0,0];
+window.onload = function init() {
+	
+    canvas = document.getElementById("gl-canvas");
+
+    gl = canvas.getContext('webgl2');
+    if (!gl) alert( "WebGL 2.0 isn't available");
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
+
     gl.enable(gl.DEPTH_TEST);
 
+    //
+    //  Load shaders and initialize attribute buffers
+    //
     program = initShaders(gl, "vertex-shader", "fragment-shader");
-    viewerPos = vec3(0.0, 0.0,-20.0);
-
-    projection = ortho(-1, 1, -1, 1, -100, 100);
-
-    var uAmbientProduct = mult(lightAmbient, materialAmbient);
-    var uDiffuseProduct = mult(lightDiffuse, materialDiffuse);
-    var uSpecularProduct = mult(lightSpecular, materialSpecular);
-
-    tBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    t_vPosition = gl.getAttribLocation(program, "aPosition");
-    gl.vertexAttribPointer(t_vPosition, 3, gl.FLOAT, false, 0, 0);
-
-    t_cBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, t_cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorC), gl.STATIC_DRAW);
-
-    v_Normal = gl.getAttribLocation(program, "aNormal");
-    gl.vertexAttribPointer(v_Normal, 3, gl.FLOAT, false, 0, 0);
-
-    var iBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-        new Uint8Array(indices), gl.STATIC_DRAW);
-
     gl.useProgram(program);
-    gl.enableVertexAttribArray(t_vPosition);
 
-    gl.enableVertexAttribArray(v_Normal);
+    colorCube();
 
+    var nBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
 
-    //set the default position
-    modelView_Matrix = mat4();
-    modelView_MatrixLoc = gl.getUniformLocation(program, "uModelViewMatrix");
-    gl.uniformMatrix4fv(modelView_MatrixLoc, false, flatten(modelView_Matrix));
+    var normalLoc = gl.getAttribLocation(program, "aNormal");
+    gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(normalLoc);
 
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(positionsArray), gl.STATIC_DRAW);
 
-    //Translation transformations
-    var translateTemp = [0, 0, 0]; //This will store all of the temporary values of the past slider value
-    document.getElementById("xTranslateSlider").onchange = function (event) {
-        var change = event.target.value - translateTemp[0];
-        modelView_Matrix = mult(modelView_Matrix, translate(change, 0, 0));
-        move = true;
-        translateTemp[0] = event.target.value;
+    var positionLoc = gl.getAttribLocation(program, "aPosition");
+    gl.vertexAttribPointer(positionLoc, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionLoc);
+	
+	 viewerPos = vec3(0.0, 0.0, -20.0);
+
+    //radius from the element
+	document.getElementById("cube_side_size").onchange = function(event) {
+       cube_size = event.target.value;
     };
-
-    document.getElementById("yTranslateSlider").onchange = function (event) {
-        var change = event.target.value - translateTemp[1];
-        modelView_Matrix = mult(modelView_Matrix, translate(0, change, 0));
-        move = true;
-        translateTemp[1] = event.target.value;
+	
+	//change material color
+	document.getElementById("material_color").onchange = function(event) {
+		materialAmbient	= hexToRgb( event.target.value);
     };
-
-    document.getElementById("zTranslateSlider").onchange = function (event) {
-        var change = event.target.value - translateTemp[2];
-        modelView_Matrix = mult(modelView_Matrix, translate(0, 0, change));
-        move = true;
-        translateTemp[2] = event.target.value;
+	
+    
+	//change shiness
+	document.getElementById("material_shn").onchange = function(event) {
+       materialShininess = event.target.value;
     };
-
-
-    //Rotation transformations
-
-    var rotateTemp = [0, 0, 0]; //This will store all of the temporary values of the past slider value
-    document.getElementById("xRotateSlider").onchange = function (event) {
-        var change = event.target.value - rotateTemp[0];
-        modelView_Matrix = mult(modelView_Matrix, rotate(change, 1.0, 0.0, 0.0));
-        move = true;
-        rotateTemp[0] = event.target.value;
+	
+	//change angle of the view
+	document.getElementById("orien_al").onchange = function(event) {
+       theta = event.target.value;  
     };
-
-    document.getElementById("yRotateSlider").onchange = function (event) {
-        var change = event.target.value - rotateTemp[1];
-        modelView_Matrix = mult(modelView_Matrix, rotate(change, 0.0, 1.0, 0.0));
-        move = true;
-        rotateTemp[1] = event.target.value;
+    
+	document.getElementById("orien_az").onchange = function(event) {
+       phi = event.target.value;  
     };
-
-    document.getElementById("zRotateSlider").onchange = function (event) {
-        var change = event.target.value - rotateTemp[2];
-        modelView_Matrix = mult(modelView_Matrix, rotate(change, 0.0, 0.0, 1.0));
-        move = true;
-        rotateTemp[2] = event.target.value;
+	
+	
+	//change projection state
+	document.getElementById("select_projs").onchange = function(event) {
+       projection = event.target.value;  
     };
-
-    //Scale transformations
-
-    var scaleTemp = [1.0, 1.0, 1.0]; //This will store all of the temporary values of the past slider value
-    document.getElementById("xScaleSlider").onchange = function (event) {
-        var change = event.target.value - scaleTemp[0] + 1.0;
-        modelView_Matrix = mult(modelView_Matrix, scale(change, 1, 1));
-        move = true;
-        scaleTemp[0] = event.target.value;
+	
+	//change coordinate of element
+	document.getElementById("coor_x").onchange = function(event) {
+       coord[0] = event.target.value;
+	 
     };
-
-    document.getElementById("yScaleSlider").onchange = function (event) {
-        var change = event.target.value - scaleTemp[1] + 1.0;
-        modelView_Matrix = mult(modelView_Matrix, scale(1, change, 1));
-        move = true;
-        scaleTemp[1] = event.target.value;
+	document.getElementById("coor_y").onchange = function(event) {
+       coord[1] = event.target.value;
+	 
     };
-    document.getElementById("zScaleSlider").onchange = function (event) {
-        var change = event.target.value - scaleTemp[2] + 1.0;
-        modelView_Matrix = mult(modelView_Matrix, scale(1, 1, change));
-        move = true;
-        scaleTemp[2] = event.target.value;
+	document.getElementById("coor_z").onchange = function(event) {
+       coord[2] = event.target.value;
+	 
     };
-
-    //Shear transformations
-    var shearTemp = [0, 0, 0]; //This will store all of the temporary values of the past slider value
-
-    document.getElementById("shearXYSlider").onchange = function (event) {
-        var change = event.target.value - shearTemp[0];
-        modelView_Matrix = mult(modelView_Matrix, shearXY(change, change));
-        move = true;
-        shearTemp[0] = event.target.value;
+	
+	//self control rotate
+	document.getElementById("rotate_x").onchange = function(event) {
+       rotate_v[0] = event.target.value;
+	 
     };
-
-
-
-    document.getElementById("shearXZSlider").onchange = function (event) {
-        var change = event.target.value - shearTemp[1];
-        modelView_Matrix = mult(modelView_Matrix, shearXZ(change, change));
-        shearTemp[1] = event.target.value;
-        move = true;
+	document.getElementById("rotate_y").onchange = function(event) {
+       rotate_v[1] = event.target.value;
+	 
     };
-
-
-    document.getElementById("shearYZSlider").onchange = function (event) {
-        var change = event.target.value - shearTemp[2];
-        modelView_Matrix = mult(modelView_Matrix, shearYZ(change, change));
-        shearTemp[2] = event.target.value;
-        move = true;
+	document.getElementById("rotate_z").onchange = function(event) {
+       rotate_v[2] = event.target.value;
+	 
     };
+	
+	//change light ambient color and intensity
+		//var amb_color = document.getElementById("amb_color");
+        //var amb_inten = document.getElementById("amb_inten");
+		 lightAmbient = scaleColor(hexToRgb(amb_color.value), Number(amb_inten.value));
+		document.getElementById("amb_color").onchange = function(event) {
+			lightAmbient = scaleColor(hexToRgb(amb_color.value), Number(amb_inten.value));
+				
+		
+		};
+	
+		document.getElementById("amb_inten").onchange = function(event) {
+			lightAmbient = scaleColor(hexToRgb(amb_color.value), Number(amb_inten.value));
+            amb_inten_value.innerHTML = "(" + amb_inten.value + ")";	
+		
+		};
+       
 
-    //Reflection transformations
-
-    document.getElementById("ReflectionX").onclick = function () {
-        modelView_Matrix = mult(modelView_Matrix, reflection(-1, 1, 1));
-        move = true;
-    }
-
-    document.getElementById("ReflectionY").onclick = function () {
-
-        modelView_Matrix = mult(modelView_Matrix, reflection(1, -1, 1));
-        move = true;
-    }
-
-    document.getElementById("ReflectionZ").onclick = function () {
-        modelView_Matrix = mult(modelView_Matrix, reflection(1, 1, -1));
-        move = true;
-    }
-
-
-
-
-    //The code below would test the order of the transformations
-
-    document.getElementById("ScaleRotate").onclick = function () { //Scale and then the rotation
-        document.getElementById("xScaleSlider").value = 0.2;
-        modelView_Matrix = mult(modelView_Matrix, scale(0.2, 1, 1));
-        document.getElementById("yRotateSlider").value = -45;
-        modelView_Matrix = mult(modelView_Matrix, rotate(-45, 0.0, 1.0, 0.0));
-        move = true;
-    }
-
-
-    document.getElementById("RotateScale").onclick = function () { //Rotation then the scale
-        document.getElementById("yRotateSlider").value = -45;
-        modelView_Matrix = mult(modelView_Matrix, rotate(-45, 0.0, 1.0, 0.0));
-        document.getElementById("xScaleSlider").value = 0.2;
-        modelView_Matrix = mult(modelView_Matrix, scale(0.2, 1, 1));
-        move = true;
-    }
-
-
-    document.getElementById("resetButton").onclick = function () {
-        //Upon the reset button being pressed, all of the transformation sliders will be set back to zero. 
-        document.getElementById("xTranslateSlider").value = 0;
-        document.getElementById("yTranslateSlider").value = 0;
-        document.getElementById("zTranslateSlider").value = 0;
-        document.getElementById("xRotateSlider").value = 0;
-        document.getElementById("yRotateSlider").value = 0;
-        document.getElementById("zRotateSlider").value = 0;
-        document.getElementById("xScaleSlider").value = 0;
-        document.getElementById("yScaleSlider").value = 0;
-        document.getElementById("zScaleSlider").value = 0;
-        document.getElementById("shearXYSlider").value = 0;
-        document.getElementById("shearXZSlider").value = 0;
-        document.getElementById("shearYZSlider").value = 0;
-
-
-
-
-        modelView_Matrix = mat4();
-        move = true;
+		//lightcolor
+	//change light ambient color
+	//scale light diffuse percentage
+	//scale light specular percentage
+		lightDiffuse = scaleColor(hexToRgb(amb_color.value), Number(light_dif.value));
+		lightSpecular = scaleColor(hexToRgb(amb_color.value), Number(light_spe.value));
+		
+		document.getElementById("light_color").onchange = function(event) {
+			 lightDiffuse = scaleColor(hexToRgb(light_color.value), Number(light_dif.value));
+			lightSpecular = scaleColor(hexToRgb(light_color.value), Number(light_spe.value));
+		
+		};
+		document.getElementById("light_dif").onchange = function(event) {
+			lightDiffuse = scaleColor(hexToRgb(light_color.value), Number(light_dif.value));
+			light_dif_value.innerHTML = "(" + light_dif_value.value + ")";
+		
+		};
+		document.getElementById("light_spe").onchange = function(event) {
+			lightSpecular = scaleColor(hexToRgb(light_color.value), Number(light_spe.value));
+			light_spe_value.innerHTML = "(" + light_spe_value.value + ")";		
+		};
+		
+	
+	//change lighton state
+	document.getElementById("light_on").onchange = function(event) {
+      var checkBox = document.getElementById("light_on");
+	   if (checkBox.checked == true){
+		   light=true;
+	   }else{
+		   light=false;
+	   }		
     };
-
-    gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"),
-        flatten(uAmbientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"),
-        flatten(uDiffuseProduct));
-    gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"),
-        flatten(uSpecularProduct));
-    gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"),
-        flatten(uLightPosition));
-
-    gl.uniform1f(gl.getUniformLocation(program,
-        "uShininess"), materialShininess);
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(program, "uProjectionMatrix"),
-        false, flatten(projection));
-
-
-
-    // var image = document.getElementById("dogImageTest");
-    // configureTexture( image );
+	
+	//change light coordinate
+	document.getElementById("light_x").onchange = function(event) {
+       light_coord[0] = event.target.value;
+	 
+    };
+	document.getElementById("light_y").onchange = function(event) {
+       light_coord[1] = event.target.value;
+	 
+    };
+	document.getElementById("light_z").onchange = function(event) {
+       light_coord[2] = event.target.value;
+	 
+    };
+	
+	//auto rotate button
+//	document.getElementById("ButtonX").onclick = function(){axis = xAxis;};
+//    document.getElementById("ButtonY").onclick = function(){axis = yAxis;};
+//    document.getElementById("ButtonZ").onclick = function(){axis = zAxis;};
+//    document.getElementById("ButtonT").onclick = function(){flag = !flag;};
+	
+	//store with html attribute location 
+	ambientProductLoc  = gl.getUniformLocation(program, "uAmbientProduct");
+	diffuseProductLoc = gl.getUniformLocation(program, "uDiffuseProduct");
+	specularProductLoc = gl.getUniformLocation(program, "uSpecularProduct");
+    lightPositionLoc = gl.getUniformLocation(program, "uLightPosition");
+    materialShininessLoc = gl.getUniformLocation(program, "uShininess");
+	projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");  
+	
+	//render
     render();
-};
+}
 
+var render = function(){
 
-function render() { //Rendering of the tetrahedron on the canvas
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    if (move == true) {
-        gl.uniformMatrix4fv(modelView_MatrixLoc, false, flatten(modelView_Matrix));
-        move = false;
-    }
+	
+	
+	lightPosition = vec4(light_coord[0], light_coord[1],light_coord[2], 0.0);
+	
+	var ambientProduct;
+	var	diffuseProduct ;
+	var	specularProduct;	
+	
+	//detemine light on or off
+	//on --> product = light * material
+	//off --> product = material
+	if(!light){
+		var temp_l	= 	vec4(0, 0, 0,1);
+		
+		ambientProduct = mult(temp_l, materialAmbient);
+		diffuseProduct = mult(temp_l, materialDiffuse);
+		specularProduct = mult(temp_l, materialSpecular);
+	}else{
+		ambientProduct = mult(lightAmbient, materialAmbient);
+		diffuseProduct = mult(lightDiffuse, materialDiffuse);
+		specularProduct = mult(lightSpecular, materialSpecular);
+		
+	}
+	
+	//decide where is the eye of view 
+	eye = vec3(radius*Math.sin(theta)*Math.cos(phi),
+        radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
 
+	
+	//View 
+	modelViewMatrix = lookAt(eye, at, up);
+	
+	 //decide projection
+	 //if 1, perspective
+	 //if 2, orthogonal
+	if(projection == 1){
+		projectionMatrix = perspective(fovy, aspect, near, far);		
+	}else if(projection == 2){
+		projectionMatrix = ortho(-2,2, -2, 2, -100, 100);
+		
+	}
+	
+	//apply translate 	
+	//apply scale
+	//apply rotate
+	var translateMat = mat4(1, 0, 0, coord[0],
+                                0, 1, 0, coord[1],
+                                0, 0, 1, coord[2],
+                                0, 0, 0, 1);
+	
+	if(flag){
+		r_theta[axis] += 2.0;
+	}			
+	modelViewMatrix = mult(modelViewMatrix, translateMat);
+	modelViewMatrix=mult( scale(cube_size,cube_size,1),modelViewMatrix);	
+    modelViewMatrix = mult(modelViewMatrix, rotate(r_theta[xAxis], vec3(1, 0, 0)));
+    modelViewMatrix = mult(modelViewMatrix, rotate(r_theta[yAxis], vec3(0, 1, 0)));
+    modelViewMatrix = mult(modelViewMatrix, rotate(r_theta[zAxis], vec3(0, 0, 1)));
+	
+	
+	 modelViewMatrix = mult(modelViewMatrix, rotate(rotate_v[xAxis], vec3(1, 0, 0)));
+    modelViewMatrix = mult(modelViewMatrix, rotate(rotate_v[yAxis], vec3(0, 1, 0)));
+    modelViewMatrix = mult(modelViewMatrix, rotate(rotate_v[zAxis], vec3(0, 0, 1)));
+	
+	
+	
+	
+	//pass data to html
+	gl.uniform4fv(ambientProductLoc,ambientProduct);
+	gl.uniform4fv(diffuseProductLoc, diffuseProduct );
+	gl.uniform4fv(specularProductLoc,specularProduct );
+	gl.uniform4fv(lightPositionLoc, lightPosition );
+	gl.uniform1f(materialShininessLoc, materialShininess);	
+    gl.uniformMatrix4fv(gl.getUniformLocation(program,
+            "uModelViewMatrix"), false, flatten(modelViewMatrix));	
+	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
+	 
+	 
+	//dray the array
+    gl.drawArrays(gl.TRIANGLES, 0, numPositions);
 
-    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_BYTE, 0);
+	//animation frame
     requestAnimationFrame(render);
+}
+}
+Projection_Lighting_Shading();
+
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? 
+		vec4(parseInt(result[1], 16) / 255, 
+			parseInt(result[2], 16) / 255, 
+			parseInt(result[3], 16) / 255, 
+			1.0) : null;
+}
+
+function scaleColor(color, factor) {
+	return mult(vec4(factor, factor, factor, 1.0), color);
 }
