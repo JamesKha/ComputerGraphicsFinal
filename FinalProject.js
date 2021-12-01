@@ -239,8 +239,9 @@ var cubes = [
 
 
     
-translate(0, 0, -2), 
-translate(0, 0, 2)
+translate(2, 0, -2), 
+translate(0, 0, -2),
+translate(0, 0, -2),
 ];
 var lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
@@ -302,14 +303,14 @@ window.onload = function init(){
     projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");
    
     //set the perspective projection
-    var fieldOfView = 70.0; //Change the value
+    var fieldOfView = 100.0; //Change the value
     var aspect = canvas.width/canvas.height;
     var zNear = 1; //Change the value
     var zFar = 2000; //Change the value
     projectionMatrix = perspective(fieldOfView, aspect, zNear, zFar);
 
     //set the model-view matrix
-    var cameraPosition = vec3(2, 2, 4.0);
+    var cameraPosition = vec3(0, 0, 0);
     var up = vec3(0.0, 1.0, 0.0);
     var target = vec3(0.0, 0.0, 0.0);
     modelViewMatrix = lookAt(cameraPosition, target, up);
