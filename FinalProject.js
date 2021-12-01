@@ -5,104 +5,130 @@ var gl;
 var numPositions  = 36;
 var texSize = 64;
 var program;
-var positionsArray = new Float32Array([
-    -0.5, -0.5,  -0.5,
-    -0.5,  0.5,  -0.5,
-     0.5, -0.5,  -0.5,
-    -0.5,  0.5,  -0.5,
-     0.5,  0.5,  -0.5,
-     0.5, -0.5,  -0.5,
 
-    -0.5, -0.5,   0.5,
-     0.5, -0.5,   0.5,
-    -0.5,  0.5,   0.5,
-    -0.5,  0.5,   0.5,
-     0.5, -0.5,   0.5,
-     0.5,  0.5,   0.5,
+var texCoord = [
+    0, 0,
+    0, 1,
+    1, 1,
+    1, 0
+];
 
-    -0.5,   0.5, -0.5,
-    -0.5,   0.5,  0.5,
-     0.5,   0.5, -0.5,
-    -0.5,   0.5,  0.5,
-     0.5,   0.5,  0.5,
-     0.5,   0.5, -0.5,
+var positionsArray = [];
+var colorsArray = [];
+var texCoordsArray = [];
 
-    -0.5,  -0.5, -0.5,
-     0.5,  -0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,  -0.5,  0.5,
-     0.5,  -0.5, -0.5,
-     0.5,  -0.5,  0.5,
+function configureTexture( image ) {
+    texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
+         gl.RGB, gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                      gl.NEAREST_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    -0.5,  -0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,   0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,   0.5,  0.5,
-    -0.5,   0.5, -0.5,
-
-     0.5,  -0.5, -0.5,
-     0.5,   0.5, -0.5,
-     0.5,  -0.5,  0.5,
-     0.5,  -0.5,  0.5,
-     0.5,   0.5, -0.5,
-     0.5,   0.5,  0.5,
-
-]);
-
-var texCoordsArray = new Float32Array([
-    // select the top left image
-    0   , 0  ,
-    0   , 0.5,
-    0.25, 0  ,
-    0   , 0.5,
-    0.25, 0.5,
-    0.25, 0  ,
-    // select the top middle image
-
-    //Write your code
-    0.25, 0  ,
-    0.5 , 0  ,
-    0.25, 0.5,
-    0.25, 0.5,
-    0.5 , 0  ,
-    0.5 , 0.5,
-
-    // select to top right image
-    0.5 , 0  ,
-    0.5 , 0.5,
-    0.75, 0  ,
-    0.5 , 0.5,
-    0.75, 0.5,
-    0.75, 0  ,
-    // select the bottom left image
-    0   , 0.5,
-    0.25, 0.5,
-    0   , 1  ,
-    0   , 1  ,
-    0.25, 0.5,
-    0.25, 1  ,
+    gl.uniform1i(gl.getUniformLocation(program, "uTexMap"), 0);
+}
 
 
+// var positionsArray = new Float32Array([
+//     -0.5, -0.5,  -0.5,
+//     -0.5,  0.5,  -0.5,
+//      0.5, -0.5,  -0.5,
+//     -0.5,  0.5,  -0.5,
+//      0.5,  0.5,  -0.5,
+//      0.5, -0.5,  -0.5,
 
-    // select the bottom middle image
-    0.25, 0.5,
-    0.25, 1  ,
-    0.5 , 0.5,
-    0.25, 1  ,
-    0.5 , 1  ,
-    0.5 , 0.5,
-    // select the bottom right image
+//     -0.5, -0.5,   0.5,
+//      0.5, -0.5,   0.5,
+//     -0.5,  0.5,   0.5,
+//     -0.5,  0.5,   0.5,
+//      0.5, -0.5,   0.5,
+//      0.5,  0.5,   0.5,
+
+//     -0.5,   0.5, -0.5,
+//     -0.5,   0.5,  0.5,
+//      0.5,   0.5, -0.5,
+//     -0.5,   0.5,  0.5,
+//      0.5,   0.5,  0.5,
+//      0.5,   0.5, -0.5,
+
+//     -0.5,  -0.5, -0.5,
+//      0.5,  -0.5, -0.5,
+//     -0.5,  -0.5,  0.5,
+//     -0.5,  -0.5,  0.5,
+//      0.5,  -0.5, -0.5,
+//      0.5,  -0.5,  0.5,
+
+//     -0.5,  -0.5, -0.5,
+//     -0.5,  -0.5,  0.5,
+//     -0.5,   0.5, -0.5,
+//     -0.5,  -0.5,  0.5,
+//     -0.5,   0.5,  0.5,
+//     -0.5,   0.5, -0.5,
+
+//      0.5,  -0.5, -0.5,
+//      0.5,   0.5, -0.5,
+//      0.5,  -0.5,  0.5,
+//      0.5,  -0.5,  0.5,
+//      0.5,   0.5, -0.5,
+//      0.5,   0.5,  0.5,
+
+// ]);
+
+// var texCoordsArray = new Float32Array([
+//     // select the top left image
+//     0   , 0  ,
+//     0   , 0.5,
+//     0.25, 0  ,
+//     0   , 0.5,
+//     0.25, 0.5,
+//     0.25, 0  ,
+//     // select the top middle image
+
+//     //Write your code
+//     0.25, 0  ,
+//     0.5 , 0  ,
+//     0.25, 0.5,
+//     0.25, 0.5,
+//     0.5 , 0  ,
+//     0.5 , 0.5,
+
+//     // select to top right image
+//     0.5 , 0  ,
+//     0.5 , 0.5,
+//     0.75, 0  ,
+//     0.5 , 0.5,
+//     0.75, 0.5,
+//     0.75, 0  ,
+//     // select the bottom left image
+//     0   , 0.5,
+//     0.25, 0.5,
+//     0   , 1  ,
+//     0   , 1  ,
+//     0.25, 0.5,
+//     0.25, 1  ,
 
 
-    0.5 , 0.5,
-    0.75, 0.5,
-    0.5 , 1  ,
-    0.5 , 1  ,
-    0.75, 0.5,
-    0.75, 1  ,
 
-]);
+//     // select the bottom middle image
+//     0.25, 0.5,
+//     0.25, 1  ,
+//     0.5 , 0.5,
+//     0.25, 1  ,
+//     0.5 , 1  ,
+//     0.5 , 0.5,
+//     // select the bottom right image
+
+
+//     0.5 , 0.5,
+//     0.75, 0.5,
+//     0.5 , 1  ,
+//     0.5 , 1  ,
+//     0.75, 0.5,
+//     0.75, 1  ,
+
+// ]);
 var normalsArray = [
     //front
     vec3(0.0, 0.0, 1.0),
@@ -153,6 +179,44 @@ var normalsArray = [
     vec3(-1.0, 0.0, 0.0),
     vec3(-1.0, 0.0, 0.0),
 ]
+
+
+function quad(a, b, c, d) {
+	positionsArray.push(vertices[a]);
+	colorsArray.push(vertexColors[a]);
+	texCoordsArray.push(texCoord[0]);
+
+	positionsArray.push(vertices[b]);
+	colorsArray.push(vertexColors[a]);
+	texCoordsArray.push(texCoord[1]);
+
+	positionsArray.push(vertices[c]);
+	colorsArray.push(vertexColors[a]);
+	texCoordsArray.push(texCoord[2]);
+
+	positionsArray.push(vertices[a]);
+	colorsArray.push(vertexColors[a]);
+	texCoordsArray.push(texCoord[0]);
+
+	positionsArray.push(vertices[c]);
+	colorsArray.push(vertexColors[a]);
+	texCoordsArray.push(texCoord[2]);
+
+	positionsArray.push(vertices[d]);
+	colorsArray.push(vertexColors[a]);
+	texCoordsArray.push(texCoord[3]);
+}
+var vertices = [
+    vec4(-0.5, -0.5,  0.5, 1.0),
+    vec4(-0.5,  0.5, 0.5, 1.0),
+    vec4(0.5,  0.5, 0.5, 1.0),
+    vec4(0.5, -0.5, 0.5, 1.0),
+    vec4(-0.5, -0.5, -0.5, 1.0),
+    vec4(-0.5,  0.5, -0.5, 1.0),
+    vec4(0.5,  0.5, -0.5, 1.0),
+    vec4(0.5, -0.5, -0.5, 1.0)
+];
+
 var texture;
 var xAxis = 0;
 var yAxis = 1;
@@ -225,7 +289,8 @@ window.onload = function init(){
     //Create buffer for texture coordinate
     var tBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, texCoordsArray, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER,texCoordsArray, gl.STATIC_DRAW);
+
     var texCoordLoc = gl.getAttribLocation(program, "aTexCoord");
     gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(texCoordLoc);
