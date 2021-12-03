@@ -238,14 +238,15 @@ var cubes = [
 
 
 
-    translate(2, 0, -2), //pig
-    translate(1, 0, -2), //chicken
+    translate(4, 0, -2), //dog
+    translate(2, 0, -2), //cat
     translate(0, 0, -2), //cow
-    translate(-1, 0, -2), //cat
-    translate(-2, 0, -2), //dog
+    translate(-2, 0, -2), //chicken
+    translate(-4, 0, -2), //pig
 ];
 
 
+var sizes = [1,1,1,1,1]
 
 
 var lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
@@ -308,58 +309,53 @@ window.onload = function init() {
     projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");
 
     //set the perspective projection
-    var fieldOfView = 120.0; //Change the value
-    var aspect = canvas.width / canvas.height;
+    var fieldOfView = 90.0; //Change the value
+    var aspect = canvas.width/canvas.height;
     var zNear = 1; //Change the value
     var zFar = 2000; //Change the value
     projectionMatrix = perspective(fieldOfView, aspect, zNear, zFar);
 
     //set the model-view matrix
-    var cameraPosition = vec3(0, 0, 0);
+    var cameraPosition = vec3(0, 2, 4.0);
     var up = vec3(0.0, 1.0, 0.0);
     var target = vec3(0.0, 0.0, 0.0);
     modelViewMatrix = lookAt(cameraPosition, target, up);
 
-    var sizes = [1,1,1,1,1]
-
-    document.getElementById("Pig").onchange = function (event) {
-        sizes[0] = event.target.value;
-        PigValue.innerHTML = "(" + event.target.value + ")";
-
-    };
-
-    document.getElementById("Chicken").onchange = function (event) {
-        sizes[1] = event.target.value;
-        ChickenValue.innerHTML = "(" + event.target.value + ")";
-
-    };
-    document.getElementById("Cow").onchange = function (event) {
-        sizes[2] = event.target.value;
-        CowValue.innerHTML = "(" + event.target.value + ")";
-
-    };
-
-
-    document.getElementById("Cat").onchange = function (event) {
-        sizes[3] = event.target.value;
-        CatValue.innerHTML = "(" + event.target.value + ")";
-
-    };
     document.getElementById("Dog").onchange = function (event) {
-        sizes[4] = event.target.value;
+        sizes[0] = event.target.value;
         DogValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
 
+    document.getElementById("Cat").onchange = function (event) {
+        sizes[1] = event.target.value;
+        ChickenValue.innerHTML = "(" + event.target.value + ")";
 
-    var scale = [
-        scale(sizes[0],sizes[0],1),
-        scale(sizes[1],sizes[1],1),
-        scale(sizes[2],sizes[2],1), 
-        scale(sizes[3],sizes[3],1),
-        scale(sizes[4],sizes[4],1),
-    ];
+    };
+
+    document.getElementById("Cow").onchange = function (event) {
+        sizes[2] =event.target.value;
+        CowValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+
+    document.getElementById("Chicken").onchange = function (event) {
+        sizes[3] = event.target.value;
+        CatValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+    document.getElementById("Pig").onchange = function (event) {
+        sizes[4] = event.target.value;
+        PigValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+
+
+
 
     //set event to the buttons
     document.getElementById("ButtonX").onclick = function () {
@@ -404,8 +400,9 @@ function render() {
     for (var index = 0; index < cubes.length; index++) {
 
         gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
+        
         viewMatrix = mult(modelViewMatrix, cubes[index]);
-        viewMatrix = mult(modelViewMatrix, sizes[index]);
+        viewMatrix = mult(viewMatrix,scale(1.0 + sizes[index]*0.2,1+ sizes[index]*0.2,1));
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[yAxis], vec3(0, 1, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[zAxis], vec3(0, 0, 1)));

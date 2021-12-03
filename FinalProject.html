@@ -7,34 +7,35 @@
     <fieldset>
 
     <label for="vol">Pig</label>
-    <input type="range" id="Pig" name="points" min="0" max="5"  value="1">
-    <label id="PigValue">(1.0)</label><br>
+    <input type="range" id="Pig" name="points" min="1" max="5"  value="1">
+    <label id="PigValue">(1)</label><br>
     <br>
     <label for="vol">Chicken</label>
-    <input type="range" id="Chicken" name="points" min="0" max="5" value="1">
-    <label id="ChickenValue">(1.0)</label><br>
+    <input type="range" id="Chicken" name="points" min="1" max="5" value="1">
+    <label id="ChickenValue">(1)</label><br>
     <br>
     <label for="vol">Cow</label>
-    <input type="range" id="Cow" name="points" min="0" max="5" value="1">
-    <label id="CowValue">(1.0)</label><br>
+    <input type="range" id="Cow" name="points" min="1" max="5" value="1">
+    <label id="CowValue">(1)</label><br>
     <br>
     <label for="vol">Cat</label>
-    <input type="range" id="Cat" name="points" min="0" max="5" value="1">
-    <label id="CatValue">(1.0)</label><br>
+    <input type="range" id="Cat" name="points" min="1" max="5" value="1">
+    <label id="CatValue">(1)</label><br>
     <br>
     <label for="vol">Dog</label>
-    <input type="range" id="Dog" name="points" min="0" max="5" value="1">
-    <label id="DogValue">(1.0)</label><br>
+    <input type="range" id="Dog" name="points" min="1" max="5" value="1">
+    <label id="DogValue">(1)</label><br>
     <br>
     </fieldset>
 
-<canvas id="gl-canvas" width="512" height="512"> </canvas>
+<canvas id="gl-canvas" width="1024" height="1024"> </canvas>
 <img id = "texImage" src = "dogImage.png" hidden></img>
 <img id = "texImage1" src = "catImage.png" hidden></img>
 <img id = "texImage2" src = "cowImage.png" hidden></img>
 <img id = "texImage3" src = "chickenImage.png" hidden></img>
 <img id = "texImage4" src = "pigImage.png" hidden></img>
 
+<input type="file" accept = '.csv'style="width:200px">
 
 <div>
     <button id = "ButtonX">Rotate X</button>
