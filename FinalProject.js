@@ -17,8 +17,10 @@ var positionsArray = [];
 var colorsArray = [];
 var texCoordsArray = [];
 
-function configureTexture( image ) {
+var textures = [];
+function configureTexture( image,index ) {
     texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0+index)
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
          gl.RGB, gl.UNSIGNED_BYTE, image);
@@ -26,8 +28,8 @@ function configureTexture( image ) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                       gl.NEAREST_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    textures.push(texture);
 
-    gl.uniform1i(gl.getUniformLocation(program, "uTexMap"), 0);
 }
 
 
@@ -241,7 +243,7 @@ var cubes = [
     
 translate(2, 0, -2), 
 translate(0, 0, -2),
-translate(0, 0, -2),
+
 ];
 var lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
@@ -297,8 +299,8 @@ window.onload = function init(){
     gl.enableVertexAttribArray(texCoordLoc);
 
     //load an image
-    var image = document.getElementById("texImage");
-    configureTexture(image);
+    // var image = document.getElementById("texImage");
+    // configureTexture(image, 0);
     modelViewMatrixLoc = gl.getUniformLocation(program, "uModelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");
    
@@ -324,18 +326,6 @@ window.onload = function init(){
 }
 
 //function for setting the texture
-function configureTexture(image){
-    texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, 
-        new Uint8Array([0, 0, 255, 255]));
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    //generate the Mipmap
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, texture);         
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-}
 
 //render function
 function render(){
@@ -347,9 +337,13 @@ function render(){
     lightPosition[0] = 5.5 * Math.sin(0.02 * time);
     lightPosition[2] = 5.5 * Math.cos(0.02 * time);
     time += 2; //Change the value
-
+    var image1 = document.getElementById("texImage")
+    var image2 = document.getElementById("texImage1")
+    var image = [image1, image2]
     //generate two cubes, one is closer to the viewer and the other farther from the viewer
     for(var index = 0; index < cubes.length; index++){
+        configureTexture(image[index],index )
+        gl.drawArrays(gl.TRIANGLES, 0, 72);
         gl.uniform4fv( gl.getUniformLocation(program, "uLightPosition"), lightPosition);
         viewMatrix = mult(modelViewMatrix, cubes[index]);
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
@@ -368,9 +362,10 @@ function render(){
         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), specularProduct);
 
         gl.uniform1f(gl.getUniformLocation(program, "uShininess"), materialShininess);
-        gl.uniform1i(textureLocation, index);
-        gl.drawArrays(gl.TRIANGLES, 0, numPositions);
+        gl.uniform1i(gl.getUniformLocation(program, "uTextureMap"),index);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
     }
+    
     requestAnimationFrame(render);
 }
 
