@@ -2,7 +2,7 @@
 /*global variable defined*/
 var canvas;
 var gl;
-var numPositions  = 36;
+var numPositions = 36;
 var texSize = 64;
 var program;
 
@@ -18,117 +18,118 @@ var colorsArray = [];
 var texCoordsArray = [];
 
 var textures = [];
-function configureTexture( image,index ) {
+
+function configureTexture(image, index) {
     texture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0+index)
+    gl.activeTexture(gl.TEXTURE0 + index)
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
-         gl.RGB, gl.UNSIGNED_BYTE, image);
+        gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-                      gl.NEAREST_MIPMAP_LINEAR);
+        gl.NEAREST_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
- 
+
 
 }
 
 
 var positionsArray = new Float32Array([
-    -0.5, -0.5,  -0.5,
-    -0.5,  0.5,  -0.5,
-     0.5, -0.5,  -0.5,
-    -0.5,  0.5,  -0.5,
-     0.5,  0.5,  -0.5,
-     0.5, -0.5,  -0.5,
+    -0.5, -0.5, -0.5,
+    -0.5, 0.5, -0.5,
+    0.5, -0.5, -0.5,
+    -0.5, 0.5, -0.5,
+    0.5, 0.5, -0.5,
+    0.5, -0.5, -0.5,
 
-    -0.5, -0.5,   0.5,
-     0.5, -0.5,   0.5,
-    -0.5,  0.5,   0.5,
-    -0.5,  0.5,   0.5,
-     0.5, -0.5,   0.5,
-     0.5,  0.5,   0.5,
+    -0.5, -0.5, 0.5,
+    0.5, -0.5, 0.5,
+    -0.5, 0.5, 0.5,
+    -0.5, 0.5, 0.5,
+    0.5, -0.5, 0.5,
+    0.5, 0.5, 0.5,
 
-    -0.5,   0.5, -0.5,
-    -0.5,   0.5,  0.5,
-     0.5,   0.5, -0.5,
-    -0.5,   0.5,  0.5,
-     0.5,   0.5,  0.5,
-     0.5,   0.5, -0.5,
+    -0.5, 0.5, -0.5,
+    -0.5, 0.5, 0.5,
+    0.5, 0.5, -0.5,
+    -0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, -0.5,
 
-    -0.5,  -0.5, -0.5,
-     0.5,  -0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,  -0.5,  0.5,
-     0.5,  -0.5, -0.5,
-     0.5,  -0.5,  0.5,
+    -0.5, -0.5, -0.5,
+    0.5, -0.5, -0.5,
+    -0.5, -0.5, 0.5,
+    -0.5, -0.5, 0.5,
+    0.5, -0.5, -0.5,
+    0.5, -0.5, 0.5,
 
-    -0.5,  -0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,   0.5, -0.5,
-    -0.5,  -0.5,  0.5,
-    -0.5,   0.5,  0.5,
-    -0.5,   0.5, -0.5,
+    -0.5, -0.5, -0.5,
+    -0.5, -0.5, 0.5,
+    -0.5, 0.5, -0.5,
+    -0.5, -0.5, 0.5,
+    -0.5, 0.5, 0.5,
+    -0.5, 0.5, -0.5,
 
-     0.5,  -0.5, -0.5,
-     0.5,   0.5, -0.5,
-     0.5,  -0.5,  0.5,
-     0.5,  -0.5,  0.5,
-     0.5,   0.5, -0.5,
-     0.5,   0.5,  0.5,
+    0.5, -0.5, -0.5,
+    0.5, 0.5, -0.5,
+    0.5, -0.5, 0.5,
+    0.5, -0.5, 0.5,
+    0.5, 0.5, -0.5,
+    0.5, 0.5, 0.5,
 
 ]);
 
 var texCoordsArray = new Float32Array([
     // select the top left image
-    0   , 0  ,
-    0   , 0.5,
-    0.25, 0  ,
-    0   , 0.5,
+    0, 0,
+    0, 0.5,
+    0.25, 0,
+    0, 0.5,
     0.25, 0.5,
-    0.25, 0  ,
+    0.25, 0,
     // select the top middle image
 
     //Write your code
-    0.25, 0  ,
-    0.5 , 0  ,
+    0.25, 0,
+    0.5, 0,
     0.25, 0.5,
     0.25, 0.5,
-    0.5 , 0  ,
-    0.5 , 0.5,
+    0.5, 0,
+    0.5, 0.5,
 
     // select to top right image
-    0.5 , 0  ,
-    0.5 , 0.5,
-    0.75, 0  ,
-    0.5 , 0.5,
+    0.5, 0,
+    0.5, 0.5,
+    0.75, 0,
+    0.5, 0.5,
     0.75, 0.5,
-    0.75, 0  ,
+    0.75, 0,
     // select the bottom left image
-    0   , 0.5,
+    0, 0.5,
     0.25, 0.5,
-    0   , 1  ,
-    0   , 1  ,
+    0, 1,
+    0, 1,
     0.25, 0.5,
-    0.25, 1  ,
+    0.25, 1,
 
 
 
     // select the bottom middle image
     0.25, 0.5,
-    0.25, 1  ,
-    0.5 , 0.5,
-    0.25, 1  ,
-    0.5 , 1  ,
-    0.5 , 0.5,
+    0.25, 1,
+    0.5, 0.5,
+    0.25, 1,
+    0.5, 1,
+    0.5, 0.5,
     // select the bottom right image
 
 
-    0.5 , 0.5,
+    0.5, 0.5,
     0.75, 0.5,
-    0.5 , 1  ,
-    0.5 , 1  ,
+    0.5, 1,
+    0.5, 1,
     0.75, 0.5,
-    0.75, 1  ,
+    0.75, 1,
 
 ]);
 var normalsArray = [
@@ -184,38 +185,38 @@ var normalsArray = [
 
 
 function quad(a, b, c, d) {
-	positionsArray.push(vertices[a]);
-	colorsArray.push(vertexColors[a]);
-	texCoordsArray.push(texCoord[0]);
+    positionsArray.push(vertices[a]);
+    colorsArray.push(vertexColors[a]);
+    texCoordsArray.push(texCoord[0]);
 
-	positionsArray.push(vertices[b]);
-	colorsArray.push(vertexColors[a]);
-	texCoordsArray.push(texCoord[1]);
+    positionsArray.push(vertices[b]);
+    colorsArray.push(vertexColors[a]);
+    texCoordsArray.push(texCoord[1]);
 
-	positionsArray.push(vertices[c]);
-	colorsArray.push(vertexColors[a]);
-	texCoordsArray.push(texCoord[2]);
+    positionsArray.push(vertices[c]);
+    colorsArray.push(vertexColors[a]);
+    texCoordsArray.push(texCoord[2]);
 
-	positionsArray.push(vertices[a]);
-	colorsArray.push(vertexColors[a]);
-	texCoordsArray.push(texCoord[0]);
+    positionsArray.push(vertices[a]);
+    colorsArray.push(vertexColors[a]);
+    texCoordsArray.push(texCoord[0]);
 
-	positionsArray.push(vertices[c]);
-	colorsArray.push(vertexColors[a]);
-	texCoordsArray.push(texCoord[2]);
+    positionsArray.push(vertices[c]);
+    colorsArray.push(vertexColors[a]);
+    texCoordsArray.push(texCoord[2]);
 
-	positionsArray.push(vertices[d]);
-	colorsArray.push(vertexColors[a]);
-	texCoordsArray.push(texCoord[3]);
+    positionsArray.push(vertices[d]);
+    colorsArray.push(vertexColors[a]);
+    texCoordsArray.push(texCoord[3]);
 }
 var vertices = [
-    vec4(-0.5, -0.5,  0.5, 1.0),
-    vec4(-0.5,  0.5, 0.5, 1.0),
-    vec4(0.5,  0.5, 0.5, 1.0),
+    vec4(-0.5, -0.5, 0.5, 1.0),
+    vec4(-0.5, 0.5, 0.5, 1.0),
+    vec4(0.5, 0.5, 0.5, 1.0),
     vec4(0.5, -0.5, 0.5, 1.0),
     vec4(-0.5, -0.5, -0.5, 1.0),
-    vec4(-0.5,  0.5, -0.5, 1.0),
-    vec4(0.5,  0.5, -0.5, 1.0),
+    vec4(-0.5, 0.5, -0.5, 1.0),
+    vec4(0.5, 0.5, -0.5, 1.0),
     vec4(0.5, -0.5, -0.5, 1.0)
 ];
 
@@ -236,31 +237,33 @@ var modelViewMatrix;
 var cubes = [
 
 
-    //translate(?, 0, ?),
-    //translate(?, 0, ?)
 
-
-    
-translate(1, 0, -2), 
-translate(0, 0, -2),
-
+    translate(2, 0, -2), //pig
+    translate(1, 0, -2), //chicken
+    translate(0, 0, -2), //cow
+    translate(-1, 0, -2), //cat
+    translate(-2, 0, -2), //dog
 ];
+
+
+
+
 var lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
-var materialAmbient = vec4(1.0, 1.0, 1.0, 1.0 );
+var materialAmbient = vec4(1.0, 1.0, 1.0, 1.0);
 var materialDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
-var materialSpecular = vec4(1.0, 1.0, 1.0, 1.0 );
+var materialSpecular = vec4(1.0, 1.0, 1.0, 1.0);
 var materialShininess = 100;
 
 //Execute a JavaScript immediately after a page has been loaded
-window.onload = function init(){
+window.onload = function init() {
 
     //Initialize the canvas by document.getElementById method
     canvas = document.getElementById("gl-canvas");
     gl = canvas.getContext('webgl2');
-    if (!gl){
+    if (!gl) {
         alert("WebGL 2.0 isn't available");
     }
     //set the viewport and canvas background color
@@ -292,7 +295,7 @@ window.onload = function init(){
     //Create buffer for texture coordinate
     var tBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER,texCoordsArray, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, texCoordsArray, gl.STATIC_DRAW);
 
     var texCoordLoc = gl.getAttribLocation(program, "aTexCoord");
     gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
@@ -303,10 +306,10 @@ window.onload = function init(){
     // configureTexture(image, 0);
     modelViewMatrixLoc = gl.getUniformLocation(program, "uModelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");
-   
+
     //set the perspective projection
-    var fieldOfView = 100.0; //Change the value
-    var aspect = canvas.width/canvas.height;
+    var fieldOfView = 120.0; //Change the value
+    var aspect = canvas.width / canvas.height;
     var zNear = 1; //Change the value
     var zFar = 2000; //Change the value
     projectionMatrix = perspective(fieldOfView, aspect, zNear, zFar);
@@ -317,21 +320,70 @@ window.onload = function init(){
     var target = vec3(0.0, 0.0, 0.0);
     modelViewMatrix = lookAt(cameraPosition, target, up);
 
+    var sizes = [1,1,1,1,1]
+
+    document.getElementById("Pig").onchange = function (event) {
+        sizes[0] = event.target.value;
+        PigValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+    document.getElementById("Chicken").onchange = function (event) {
+        sizes[1] = event.target.value;
+        ChickenValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+    document.getElementById("Cow").onchange = function (event) {
+        sizes[2] = event.target.value;
+        CowValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+
+    document.getElementById("Cat").onchange = function (event) {
+        sizes[3] = event.target.value;
+        CatValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+    document.getElementById("Dog").onchange = function (event) {
+        sizes[4] = event.target.value;
+        DogValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+
+
+    var scale = [
+        scale(sizes[0],sizes[0],1),
+        scale(sizes[1],sizes[1],1),
+        scale(sizes[2],sizes[2],1), 
+        scale(sizes[3],sizes[3],1),
+        scale(sizes[4],sizes[4],1),
+    ];
+
     //set event to the buttons
-    document.getElementById("ButtonX").onclick = function(){axis = xAxis;};
-    document.getElementById("ButtonY").onclick = function(){axis = yAxis;};
-    document.getElementById("ButtonZ").onclick = function(){axis = zAxis;};
-    document.getElementById("ButtonT").onclick = function(){flag = !flag;};
-    render(); 
+    document.getElementById("ButtonX").onclick = function () {
+        axis = xAxis;
+    };
+    document.getElementById("ButtonY").onclick = function () {
+        axis = yAxis;
+    };
+    document.getElementById("ButtonZ").onclick = function () {
+        axis = zAxis;
+    };
+    document.getElementById("ButtonT").onclick = function () {
+        flag = !flag;
+    };
+    render();
 }
 
 //function for setting the texture
 
 //render function
-function render(){
+function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    if(flag){
-        theta[axis] += 2.0;  //Change the value
+    if (flag) {
+        theta[axis] += 2.0; //Change the value
     }
     //rotating the light
     lightPosition[0] = 5.5 * Math.sin(0.02 * time);
@@ -339,16 +391,21 @@ function render(){
     time += 2; //Change the value
     var image1 = document.getElementById("texImage")
     var image2 = document.getElementById("texImage1")
-    var image = [image1, image2]
+    var image3 = document.getElementById("texImage2")
+    var image4 = document.getElementById("texImage3")
+    var image5 = document.getElementById("texImage4")
+
+    var image = [image1, image2, image3, image4, image5]
 
     for (let index = 0; index < image.length; index++) {
-        configureTexture(image[index],index )
-      }
+        configureTexture(image[index], index)
+    }
     //generate two cubes, one is closer to the viewer and the other farther from the viewer
-    for(var index = 0; index < cubes.length; index++){
+    for (var index = 0; index < cubes.length; index++) {
 
-        gl.uniform4fv( gl.getUniformLocation(program, "uLightPosition"), lightPosition);
+        gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
         viewMatrix = mult(modelViewMatrix, cubes[index]);
+        viewMatrix = mult(modelViewMatrix, sizes[index]);
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[yAxis], vec3(0, 1, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[zAxis], vec3(0, 0, 1)));
@@ -365,11 +422,9 @@ function render(){
         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), specularProduct);
 
         gl.uniform1f(gl.getUniformLocation(program, "uShininess"), materialShininess);
-        gl.uniform1i(gl.getUniformLocation(program, "uTextureMap"),index);
+        gl.uniform1i(gl.getUniformLocation(program, "uTextureMap"), index);
         gl.drawArrays(gl.TRIANGLES, 0, 36);
     }
-    
+
     requestAnimationFrame(render);
 }
-
-
