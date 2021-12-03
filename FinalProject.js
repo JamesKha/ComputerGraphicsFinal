@@ -28,7 +28,7 @@ function configureTexture( image,index ) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                       gl.NEAREST_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    textures.push(texture);
+ 
 
 }
 
@@ -241,7 +241,7 @@ var cubes = [
 
 
     
-translate(2, 0, -2), 
+translate(1, 0, -2), 
 translate(0, 0, -2),
 
 ];
@@ -340,10 +340,13 @@ function render(){
     var image1 = document.getElementById("texImage")
     var image2 = document.getElementById("texImage1")
     var image = [image1, image2]
+
+    for (let index = 0; index < image.length; index++) {
+        configureTexture(image[index],index )
+      }
     //generate two cubes, one is closer to the viewer and the other farther from the viewer
     for(var index = 0; index < cubes.length; index++){
-        configureTexture(image[index],index )
-        gl.drawArrays(gl.TRIANGLES, 0, 72);
+
         gl.uniform4fv( gl.getUniformLocation(program, "uLightPosition"), lightPosition);
         viewMatrix = mult(modelViewMatrix, cubes[index]);
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
