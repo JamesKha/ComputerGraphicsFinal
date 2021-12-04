@@ -29,8 +29,6 @@ function configureTexture(image, index) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
         gl.NEAREST_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-
 }
 
 
@@ -132,6 +130,48 @@ var texCoordsArray = new Float32Array([
     0.75, 1,
 
 ]);
+
+
+
+
+
+
+function Pig() {
+    this.quantity = 1;
+    this.enable = 1;
+    this.image = document.getElementById("texImage4")
+}
+
+function Chicken() {
+    this.quantity = 1;
+    this.enable = 1;
+    this.image = document.getElementById("texImage3")
+}
+
+
+function Pig() {
+    this.quantity = 1;
+    this.enable = 1;
+    this.image = document.getElementById("texImage2")
+}
+
+function Cat() {
+    this.quantity = 1;
+    this.enable = 1;
+    this.image = document.getElementById("texImage1")
+}
+
+
+function Dog() {
+    this.quantity = 1;
+    this.enable = 1;
+    this.image = document.getElementById("texImage")
+}
+
+
+
+
+
 var normalsArray = [
     //front
     vec3(0.0, 0.0, 1.0),
@@ -246,7 +286,7 @@ var cubes = [
 ];
 
 
-var sizes = [1,1,1,1,1]
+var sizes = [1, 1, 1, 1, 1]
 
 
 var lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
@@ -310,7 +350,7 @@ window.onload = function init() {
 
     //set the perspective projection
     var fieldOfView = 90.0; //Change the value
-    var aspect = canvas.width/canvas.height;
+    var aspect = canvas.width / canvas.height;
     var zNear = 1; //Change the value
     var zFar = 2000; //Change the value
     projectionMatrix = perspective(fieldOfView, aspect, zNear, zFar);
@@ -324,8 +364,27 @@ window.onload = function init() {
     document.getElementById("Dog").onchange = function (event) {
         sizes[0] = event.target.value;
         DogValue.innerHTML = "(" + event.target.value + ")";
-
     };
+
+
+    // function myFunction() {
+    //     // Get the checkbox
+    //     var enablePig = document.getElementById("enablePig");
+    //     var enableChicken = document.getElementById("enableChicken");
+    //     var enableCow = document.getElementById("enableCow");
+    //     var enableCat = document.getElementById("enableCat");
+    //     var enableDog = document.getElementById("enableDog");
+    //     // Get the output text
+
+    //     // If the checkbox is checked, display the output text
+    //     if (checkBox.checked == true){
+    //       text.style.display = "block";
+    //     } else {
+    //       text.style.display = "none";
+    //     }
+    //   }
+
+
 
 
     document.getElementById("Chicken").onchange = function (event) {
@@ -335,7 +394,7 @@ window.onload = function init() {
     };
 
     document.getElementById("Cow").onchange = function (event) {
-        sizes[2] =event.target.value;
+        sizes[2] = event.target.value;
         CowValue.innerHTML = "(" + event.target.value + ")";
 
     };
@@ -376,16 +435,16 @@ window.onload = function init() {
 }
 
 document.getElementById('inputfile')
-.addEventListener('change', function() {
-  
-var fr=new FileReader();
-fr.onload=function(){
-    document.getElementById('output')
-            .textContent=fr.result;
-}
-  
-fr.readAsText(this.files[0]);
-})
+    .addEventListener('change', function () {
+
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById('output')
+                .textContent = fr.result;
+        }
+
+        fr.readAsText(this.files[0]);
+    })
 
 //function for setting the texture
 
@@ -414,9 +473,9 @@ function render() {
     for (var index = 0; index < cubes.length; index++) {
 
         gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
-        
+
         viewMatrix = mult(modelViewMatrix, cubes[index]);
-        viewMatrix = mult(viewMatrix,scale(1.0 + sizes[index]*0.2,1+ sizes[index]*0.2,1));
+        viewMatrix = mult(viewMatrix, scale(1.0 + sizes[index] * 0.2, 1 + sizes[index] * 0.2, 1));
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[yAxis], vec3(0, 1, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[zAxis], vec3(0, 0, 1)));
