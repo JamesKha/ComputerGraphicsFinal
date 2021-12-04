@@ -21,7 +21,7 @@ var textures = [];
 
 function configureTexture(image, index) {
     texture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0 + index)
+    gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB,
         gl.RGB, gl.UNSIGNED_BYTE, image);
@@ -328,8 +328,8 @@ window.onload = function init() {
     };
 
 
-    document.getElementById("Cat").onchange = function (event) {
-        sizes[1] = event.target.value;
+    document.getElementById("Chicken").onchange = function (event) {
+        sizes[3] = event.target.value;
         ChickenValue.innerHTML = "(" + event.target.value + ")";
 
     };
@@ -341,8 +341,8 @@ window.onload = function init() {
     };
 
 
-    document.getElementById("Chicken").onchange = function (event) {
-        sizes[3] = event.target.value;
+    document.getElementById("Cat").onchange = function (event) {
+        sizes[1] = event.target.value;
         CatValue.innerHTML = "(" + event.target.value + ")";
 
     };
@@ -352,6 +352,8 @@ window.onload = function init() {
         PigValue.innerHTML = "(" + event.target.value + ")";
 
     };
+
+
 
 
 
