@@ -240,11 +240,11 @@ var cubes = [
 
 
 
-    translate(4, 0, -2), //dog
-    translate(2, 0, -2), //cat
+    translate(6, 0, -2), //dog
+    translate(3, 0, -2), //cat
     translate(0, 0, -2), //cow
-    translate(-2, 0, -2), //chicken
-    translate(-4, 0, -2), //pig
+    translate(-3, 0, -2), //chicken
+    translate(-6, 0, -2), //pig
 ];
 
 
@@ -311,7 +311,7 @@ window.onload = function init() {
     projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");
 
     //set the perspective projection
-    var fieldOfView = 90.0; //Change the value
+    var fieldOfView = 100.0; //Change the value
     var aspect = canvas.width / canvas.height;
     var zNear = 1; //Change the value
     var zFar = 2000; //Change the value
@@ -325,9 +325,12 @@ window.onload = function init() {
 
 
     document.getElementById("Dog").onchange = function(event) {
+        if(document.getElementById("enableDog").checked){
         sizes[0] = event.target.value;
+        }
         DogValue.innerHTML = "(" + event.target.value + ")";
     };
+
     $("#enableDog").change(function() {
         if (this.checked) {
             sizes[0] = document.getElementById("Dog").value;
@@ -338,9 +341,10 @@ window.onload = function init() {
 
 
     document.getElementById("Cat").onchange = function(event) {
+        if(document.getElementById("enableCat").checked){
         sizes[1] = event.target.value;
+        }
         CatValue.innerHTML = "(" + event.target.value + ")";
-
     };
 
 
@@ -355,7 +359,9 @@ window.onload = function init() {
 
 
     document.getElementById("Cow").onchange = function(event) {
+        if(document.getElementById("enableCow").checked){
         sizes[2] = event.target.value;
+        }
         CowValue.innerHTML = "(" + event.target.value + ")";
 
     };
@@ -370,7 +376,9 @@ window.onload = function init() {
     });
 
     document.getElementById("Chicken").onchange = function(event) {
+        if(document.getElementById("enableChicken").checked){
         sizes[3] = event.target.value;
+        }
         ChickenValue.innerHTML = "(" + event.target.value + ")";
 
     };
@@ -385,7 +393,9 @@ window.onload = function init() {
     });
 
     document.getElementById("Pig").onchange = function(event) {
+        if(document.getElementById("enablePig").checked){
         sizes[4] = event.target.value;
+        }
         PigValue.innerHTML = "(" + event.target.value + ")";
 
     };
@@ -458,7 +468,11 @@ function render() {
         gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
 
         viewMatrix = mult(modelViewMatrix, cubes[index]);
+        if (sizes[index] > 0){
         viewMatrix = mult(viewMatrix, scale(1.0 + sizes[index] * 0.2, 1 + sizes[index] * 0.2, 1));
+        }else{
+            viewMatrix = mult(viewMatrix, scale(0, 0 , 1));
+        }
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[yAxis], vec3(0, 1, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[zAxis], vec3(0, 0, 1)));
