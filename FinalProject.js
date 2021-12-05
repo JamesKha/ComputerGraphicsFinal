@@ -136,41 +136,6 @@ var texCoordsArray = new Float32Array([
 
 
 
-function Pig() {
-    this.quantity = 1;
-    this.enable = 1;
-    this.image = document.getElementById("texImage4")
-}
-
-function Chicken() {
-    this.quantity = 1;
-    this.enable = 1;
-    this.image = document.getElementById("texImage3")
-}
-
-
-function Pig() {
-    this.quantity = 1;
-    this.enable = 1;
-    this.image = document.getElementById("texImage2")
-}
-
-function Cat() {
-    this.quantity = 1;
-    this.enable = 1;
-    this.image = document.getElementById("texImage1")
-}
-
-
-function Dog() {
-    this.quantity = 1;
-    this.enable = 1;
-    this.image = document.getElementById("texImage")
-}
-
-
-
-
 
 var normalsArray = [
     //front
@@ -361,43 +326,42 @@ window.onload = function init() {
     var target = vec3(0.0, 0.0, 0.0);
     modelViewMatrix = lookAt(cameraPosition, target, up);
 
+
+
+    // Get the checkbox
+
+    var enableChicken = document.getElementById("enableChicken");
+    var enableCow = document.getElementById("enableCow");
+    var enableCat = document.getElementById("enableCat");
+    var enableDog = document.getElementById("enableDog");
+    // Get the output text
+
+  
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
     document.getElementById("Dog").onchange = function (event) {
         sizes[0] = event.target.value;
         DogValue.innerHTML = "(" + event.target.value + ")";
     };
-
-
-    // function myFunction() {
-    //     // Get the checkbox
-    //     var enablePig = document.getElementById("enablePig");
-    //     var enableChicken = document.getElementById("enableChicken");
-    //     var enableCow = document.getElementById("enableCow");
-    //     var enableCat = document.getElementById("enableCat");
-    //     var enableDog = document.getElementById("enableDog");
-    //     // Get the output text
-
-    //     // If the checkbox is checked, display the output text
-    //     if (checkBox.checked == true){
-    //       text.style.display = "block";
-    //     } else {
-    //       text.style.display = "none";
-    //     }
-    //   }
-
-
-
-
-    document.getElementById("Chicken").onchange = function (event) {
-        sizes[3] = event.target.value;
-        ChickenValue.innerHTML = "(" + event.target.value + ")";
-
-    };
-
-    document.getElementById("Cow").onchange = function (event) {
-        sizes[2] = event.target.value;
-        CowValue.innerHTML = "(" + event.target.value + ")";
-
-    };
+    $("#enableDog").change(function () {
+        if (this.checked) {
+            sizes[0] = document.getElementById("Dog").value;
+        } else {
+            sizes[0] = 0;
+        }
+    });
 
 
     document.getElementById("Cat").onchange = function (event) {
@@ -406,14 +370,60 @@ window.onload = function init() {
 
     };
 
+    
+    $("#enableCat").change(function () {
+        if (this.checked) {
+            sizes[1] = document.getElementById("Cat").value;
+        } else {
+            sizes[1] = 0;
+        }
+    });
+
+
+
+    document.getElementById("Cow").onchange = function (event) {
+        sizes[2] = event.target.value;
+        CowValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+
+    $("#enableCow").change(function () {
+        if (this.checked) {
+            sizes[2] = document.getElementById("Cow").value;
+        } else {
+            sizes[2] = 0;
+        }
+    });
+
+    document.getElementById("Chicken").onchange = function (event) {
+        sizes[3] = event.target.value;
+        ChickenValue.innerHTML = "(" + event.target.value + ")";
+
+    };
+
+
+    $("#enableChicken").change(function () {
+        if (this.checked) {
+            sizes[3] = document.getElementById("Chicken").value;
+        } else {
+            sizes[3] = 0;
+        }
+    });
+
     document.getElementById("Pig").onchange = function (event) {
         sizes[4] = event.target.value;
         PigValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
-
-
+    $("#enablePig").change(function () {
+        if (this.checked) {
+            sizes[4] = document.getElementById("Pig").value;
+        } else {
+            sizes[4] = 0;
+        }
+    });
 
 
 
