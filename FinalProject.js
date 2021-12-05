@@ -134,9 +134,6 @@ var texCoordsArray = new Float32Array([
 
 
 
-
-
-
 var normalsArray = [
     //front
     vec3(0.0, 0.0, 1.0),
@@ -327,35 +324,11 @@ window.onload = function init() {
     modelViewMatrix = lookAt(cameraPosition, target, up);
 
 
-
-    // Get the checkbox
-
-    var enableChicken = document.getElementById("enableChicken");
-    var enableCow = document.getElementById("enableCow");
-    var enableCat = document.getElementById("enableCat");
-    var enableDog = document.getElementById("enableDog");
-    // Get the output text
-
-  
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-    document.getElementById("Dog").onchange = function (event) {
+    document.getElementById("Dog").onchange = function(event) {
         sizes[0] = event.target.value;
         DogValue.innerHTML = "(" + event.target.value + ")";
     };
-    $("#enableDog").change(function () {
+    $("#enableDog").change(function() {
         if (this.checked) {
             sizes[0] = document.getElementById("Dog").value;
         } else {
@@ -364,14 +337,14 @@ window.onload = function init() {
     });
 
 
-    document.getElementById("Cat").onchange = function (event) {
+    document.getElementById("Cat").onchange = function(event) {
         sizes[1] = event.target.value;
         CatValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
-    
-    $("#enableCat").change(function () {
+
+    $("#enableCat").change(function() {
         if (this.checked) {
             sizes[1] = document.getElementById("Cat").value;
         } else {
@@ -381,14 +354,14 @@ window.onload = function init() {
 
 
 
-    document.getElementById("Cow").onchange = function (event) {
+    document.getElementById("Cow").onchange = function(event) {
         sizes[2] = event.target.value;
         CowValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
 
-    $("#enableCow").change(function () {
+    $("#enableCow").change(function() {
         if (this.checked) {
             sizes[2] = document.getElementById("Cow").value;
         } else {
@@ -396,14 +369,14 @@ window.onload = function init() {
         }
     });
 
-    document.getElementById("Chicken").onchange = function (event) {
+    document.getElementById("Chicken").onchange = function(event) {
         sizes[3] = event.target.value;
         ChickenValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
 
-    $("#enableChicken").change(function () {
+    $("#enableChicken").change(function() {
         if (this.checked) {
             sizes[3] = document.getElementById("Chicken").value;
         } else {
@@ -411,13 +384,13 @@ window.onload = function init() {
         }
     });
 
-    document.getElementById("Pig").onchange = function (event) {
+    document.getElementById("Pig").onchange = function(event) {
         sizes[4] = event.target.value;
         PigValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
-    $("#enablePig").change(function () {
+    $("#enablePig").change(function() {
         if (this.checked) {
             sizes[4] = document.getElementById("Pig").value;
         } else {
@@ -429,26 +402,26 @@ window.onload = function init() {
 
 
     //set event to the buttons
-    document.getElementById("ButtonX").onclick = function () {
+    document.getElementById("ButtonX").onclick = function() {
         axis = xAxis;
     };
-    document.getElementById("ButtonY").onclick = function () {
+    document.getElementById("ButtonY").onclick = function() {
         axis = yAxis;
     };
-    document.getElementById("ButtonZ").onclick = function () {
+    document.getElementById("ButtonZ").onclick = function() {
         axis = zAxis;
     };
-    document.getElementById("ButtonT").onclick = function () {
+    document.getElementById("ButtonT").onclick = function() {
         flag = !flag;
     };
     render();
 }
 
 document.getElementById('inputfile')
-    .addEventListener('change', function () {
+    .addEventListener('change', function() {
 
         var fr = new FileReader();
-        fr.onload = function () {
+        fr.onload = function() {
             document.getElementById('output')
                 .textContent = fr.result;
         }
