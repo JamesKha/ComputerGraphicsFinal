@@ -476,6 +476,10 @@ myForm.addEventListener("submit", function (e) {
 });
 
 console.log(testArray);
+
+var objIndex = testArray.findIndex((obj => obj.Quantity == 1));
+testArray[objIndex].Quantity = parseInt(testArray[objIndex].Quantity)
+console.log(testArray[objIndex])
 //End code #001
 //function for setting the texture
 
