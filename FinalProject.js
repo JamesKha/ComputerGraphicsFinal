@@ -436,7 +436,7 @@ function csvToArray(str, delimiter = ",") {
 
     // slice from \n index + 1 to the end of the text
     // use split to create an array of each csv value row
-    const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+    const rows = str.slice(str.indexOf("\n") + 1).split("\r\n");
 
     // Map the rows
     // split values from each row into an array
@@ -469,7 +469,6 @@ myForm.addEventListener("submit", function (e) {
     reader.onload = function (e) {
         const text = e.target.result;
         const data = csvToArray(text);
-        //const data = csvToArray(text); 
         testArray.push(data);
     };
 
