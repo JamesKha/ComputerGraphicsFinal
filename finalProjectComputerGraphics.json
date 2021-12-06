@@ -1,0 +1,22 @@
+[
+ {
+   "Animal Name": "Pig",
+   "Quantity": 1
+ },
+ {
+   "Animal Name": "Chicken",
+   "Quantity": 2
+ },
+ {
+   "Animal Name": "Cow",
+   "Quantity": 3
+ },
+ {
+   "Animal Name": "Cat",
+   "Quantity": 4
+ },
+ {
+   "Animal Name": "Dog",
+   "Quantity": 5
+ }
+]
