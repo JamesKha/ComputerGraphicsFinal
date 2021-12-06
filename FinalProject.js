@@ -324,14 +324,14 @@ window.onload = function init() {
     modelViewMatrix = lookAt(cameraPosition, target, up);
 
 
-    document.getElementById("Dog").onchange = function(event) {
-        if(document.getElementById("enableDog").checked){
-        sizes[0] = event.target.value;
+    document.getElementById("Dog").onchange = function (event) {
+        if (document.getElementById("enableDog").checked) {
+            sizes[0] = event.target.value;
         }
         DogValue.innerHTML = "(" + event.target.value + ")";
     };
 
-    $("#enableDog").change(function() {
+    $("#enableDog").change(function () {
         if (this.checked) {
             sizes[0] = document.getElementById("Dog").value;
         } else {
@@ -340,15 +340,15 @@ window.onload = function init() {
     });
 
 
-    document.getElementById("Cat").onchange = function(event) {
-        if(document.getElementById("enableCat").checked){
-        sizes[1] = event.target.value;
+    document.getElementById("Cat").onchange = function (event) {
+        if (document.getElementById("enableCat").checked) {
+            sizes[1] = event.target.value;
         }
         CatValue.innerHTML = "(" + event.target.value + ")";
     };
 
 
-    $("#enableCat").change(function() {
+    $("#enableCat").change(function () {
         if (this.checked) {
             sizes[1] = document.getElementById("Cat").value;
         } else {
@@ -358,16 +358,16 @@ window.onload = function init() {
 
 
 
-    document.getElementById("Cow").onchange = function(event) {
-        if(document.getElementById("enableCow").checked){
-        sizes[2] = event.target.value;
+    document.getElementById("Cow").onchange = function (event) {
+        if (document.getElementById("enableCow").checked) {
+            sizes[2] = event.target.value;
         }
         CowValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
 
-    $("#enableCow").change(function() {
+    $("#enableCow").change(function () {
         if (this.checked) {
             sizes[2] = document.getElementById("Cow").value;
         } else {
@@ -375,16 +375,16 @@ window.onload = function init() {
         }
     });
 
-    document.getElementById("Chicken").onchange = function(event) {
-        if(document.getElementById("enableChicken").checked){
-        sizes[3] = event.target.value;
+    document.getElementById("Chicken").onchange = function (event) {
+        if (document.getElementById("enableChicken").checked) {
+            sizes[3] = event.target.value;
         }
         ChickenValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
 
-    $("#enableChicken").change(function() {
+    $("#enableChicken").change(function () {
         if (this.checked) {
             sizes[3] = document.getElementById("Chicken").value;
         } else {
@@ -392,15 +392,15 @@ window.onload = function init() {
         }
     });
 
-    document.getElementById("Pig").onchange = function(event) {
-        if(document.getElementById("enablePig").checked){
-        sizes[4] = event.target.value;
+    document.getElementById("Pig").onchange = function (event) {
+        if (document.getElementById("enablePig").checked) {
+            sizes[4] = event.target.value;
         }
         PigValue.innerHTML = "(" + event.target.value + ")";
 
     };
 
-    $("#enablePig").change(function() {
+    $("#enablePig").change(function () {
         if (this.checked) {
             sizes[4] = document.getElementById("Pig").value;
         } else {
@@ -412,33 +412,72 @@ window.onload = function init() {
 
 
     //set event to the buttons
-    document.getElementById("ButtonX").onclick = function() {
+    document.getElementById("ButtonX").onclick = function () {
         axis = xAxis;
     };
-    document.getElementById("ButtonY").onclick = function() {
+    document.getElementById("ButtonY").onclick = function () {
         axis = yAxis;
     };
-    document.getElementById("ButtonZ").onclick = function() {
+    document.getElementById("ButtonZ").onclick = function () {
         axis = zAxis;
     };
-    document.getElementById("ButtonT").onclick = function() {
+    document.getElementById("ButtonT").onclick = function () {
         flag = !flag;
     };
     render();
 }
 
-document.getElementById('inputfile')
-    .addEventListener('change', function() {
 
-        var fr = new FileReader();
-        fr.onload = function() {
-            document.getElementById('output')
-                .textContent = fr.result;
-        }
+//Testing code to allow CSV files to be read - #001
+function csvToArray(str, delimiter = ",") {
+    // slice from start of text to the first \n index
+    // use split to create an array from string by delimiter
+    const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
 
-        fr.readAsText(this.files[0]);
-    })
+    // slice from \n index + 1 to the end of the text
+    // use split to create an array of each csv value row
+    const rows = str.slice(str.indexOf("\n") + 1).split("\n");
 
+    // Map the rows
+    // split values from each row into an array
+    // use headers.reduce to create an object
+    // object properties derived from headers:values
+    // the object passed as an element of the array
+    const arr = rows.map(function (row) {
+        const values = row.split(delimiter);
+        const el = headers.reduce(function (object, header, index) {
+            object[header] = values[index];
+            return object;
+        }, {});
+        return el;
+    });
+
+    // return the array
+    return arr;
+}
+
+
+var testArray = [];
+const myForm = document.getElementById("myForm");
+const csvFile = document.getElementById("csvFile");
+
+myForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const input = csvFile.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        const text = e.target.result;
+        const data = csvToArray(text);
+        //const data = csvToArray(text); 
+        testArray.push(data);
+    };
+
+    reader.readAsText(input);
+});
+
+console.log(testArray);
+//End code #001
 //function for setting the texture
 
 //render function
@@ -468,10 +507,10 @@ function render() {
         gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
 
         viewMatrix = mult(modelViewMatrix, cubes[index]);
-        if (sizes[index] > 0){
-        viewMatrix = mult(viewMatrix, scale(1.0 + sizes[index] * 0.2, 1 + sizes[index] * 0.2, 1));
-        }else{
-            viewMatrix = mult(viewMatrix, scale(0, 0 , 1));
+        if (sizes[index] > 0) {
+            viewMatrix = mult(viewMatrix, scale(1.0 + sizes[index] * 0.2, 1 + sizes[index] * 0.2, 1));
+        } else {
+            viewMatrix = mult(viewMatrix, scale(0, 0, 1));
         }
         viewMatrix = mult(viewMatrix, rotate(theta[xAxis], vec3(1, 0, 0)));
         viewMatrix = mult(viewMatrix, rotate(theta[yAxis], vec3(0, 1, 0)));
