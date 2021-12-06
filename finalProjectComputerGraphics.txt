@@ -1,0 +1,5 @@
+"Dog": 5, 
+"Cat": 4, 
+"Cow": 3, 
+"Chicken": 2, 
+"Pig": 1 
