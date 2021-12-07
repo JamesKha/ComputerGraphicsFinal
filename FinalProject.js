@@ -19,6 +19,10 @@ var texCoordsArray = [];
 
 var textures = [];
 
+var testArray = [];
+const myForm = document.getElementById("myForm");
+const csvFile = document.getElementById("csvFile");
+
 function configureTexture(image, index) {
     texture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0 + index);
@@ -31,6 +35,32 @@ function configureTexture(image, index) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
 
+function csvToArray(str, delimiter = ",") {
+    // slice from start of text to the first \n index
+    // use split to create an array from string by delimiter
+    const headers = str.slice(0, str.indexOf("\r")).split(delimiter);
+
+    // slice from \n index + 1 to the end of the text
+    // use split to create an array of each csv value row
+    const rows = str.slice(str.indexOf("\n") + 1).split("\r\n");
+
+    // Map the rows
+    // split values from each row into an array
+    // use headers.reduce to create an object
+    // object properties derived from headers:values
+    // the object passed as an element of the array
+    const arr = rows.map(function (row) {
+        const values = row.split(delimiter);
+        const el = headers.reduce(function (object, header, index) {
+            object[header] = values[index];
+            return object;
+        }, {});
+        return el;
+    });
+
+    // return the array
+    return arr;
+}
 
 var positionsArray = new Float32Array([
     -0.5, -0.5, -0.5,
@@ -408,8 +438,63 @@ window.onload = function init() {
         }
     });
 
-
-
+    myForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const input = csvFile.files[0];
+        const reader = new FileReader();
+    
+        reader.onload = function (e) {
+            const text = e.target.result;
+            const data = csvToArray(text);
+            for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+                testArray.push(element);
+    
+            }
+        };
+        reader.readAsText(input);
+        for (let index = 0; index < testArray.length; index++) {
+            const element = testArray[index];
+            switch (element['Animal Name']) {
+                case "Dog":
+                    console.log('Dog', element['Quantity']);
+                    document.getElementById("Dog").value = element['Quantity'];
+                    sizes[0]  = element['Quantity'];
+                    DogValue.innerHTML = "(" + element['Quantity'] + ")";
+                    break; 
+    
+                case "Cat":
+                    console.log('Cat', element['Quantity']);
+                    document.getElementById("Cat").value = element['Quantity'];
+                    sizes[1]  = element['Quantity'];
+                    CatValue.innerHTML = "(" + element['Quantity'] + ")";
+                    break; 
+    
+                case "Cow":
+                    console.log('Cow', element['Quantity']);
+                    document.getElementById("Cow").value = element['Quantity'];
+                    sizes[2]  = element['Quantity'];
+                    CowValue.innerHTML = "(" + element['Quantity'] + ")";
+                    break; 
+    
+                case "Chicken":
+                    console.log('Chicken', element['Quantity']);
+                    document.getElementById("Chicken").value = element['Quantity'];
+                    sizes[3]  = element['Quantity'];
+                    ChickenValue.innerHTML = "(" + element['Quantity'] + ")";
+                    break; 
+    
+                case "Pig":
+                    console.log('Pig', element['Quantity']);
+                    document.getElementById("Pig").value = element['Quantity'];
+                    sizes[4]  = element['Quantity'];
+                    PigValue.innerHTML = "(" + element['Quantity'] + ")";
+                    break; 
+            }
+    
+        }
+    
+    });
 
     //set event to the buttons
     document.getElementById("ButtonX").onclick = function () {
@@ -428,58 +513,18 @@ window.onload = function init() {
 }
 
 
-//Testing code to allow CSV files to be read - #001
-function csvToArray(str, delimiter = ",") {
-    // slice from start of text to the first \n index
-    // use split to create an array from string by delimiter
-    const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-
-    // slice from \n index + 1 to the end of the text
-    // use split to create an array of each csv value row
-    const rows = str.slice(str.indexOf("\n") + 1).split("\r\n");
-
-    // Map the rows
-    // split values from each row into an array
-    // use headers.reduce to create an object
-    // object properties derived from headers:values
-    // the object passed as an element of the array
-    const arr = rows.map(function (row) {
-        const values = row.split(delimiter);
-        const el = headers.reduce(function (object, header, index) {
-            object[header] = values[index];
-            return object;
-        }, {});
-        return el;
-    });
-
-    // return the array
-    return arr;
-}
 
 
-var testArray = [];
-const myForm = document.getElementById("myForm");
-const csvFile = document.getElementById("csvFile");
 
-myForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const input = csvFile.files[0];
-    const reader = new FileReader();
 
-    reader.onload = function (e) {
-        const text = e.target.result;
-        const data = csvToArray(text);
-        testArray.push(data);
-    };
 
-    reader.readAsText(input);
-});
 
-console.log(testArray);
 
-var objIndex = testArray.findIndex((obj => obj.Quantity == 1));
-testArray[objIndex].Quantity = parseInt(testArray[objIndex].Quantity)
-console.log(testArray[objIndex])
+
+
+
+
+// console.log(testArray)
 //End code #001
 //function for setting the texture
 
