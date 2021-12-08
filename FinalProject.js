@@ -255,7 +255,7 @@ var modelViewMatrixLoc;
 var projectionMatrixLoc;
 var textureLocation;
 var viewMatrix;
-var time = 0;
+// var time = 0;
 var projectionMatrix;
 var modelViewMatrix;
 var cubes = [
@@ -273,7 +273,8 @@ var cubes = [
 var sizes = [1, 1, 1, 1, 1]
 
 
-var lightPosition = vec4(0.0, 2.0, 0.0, 1.0);
+var lightPosition =  vec4(1.0,1.0,3.0, 0.0);
+
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
@@ -336,7 +337,7 @@ window.onload = function init() {
     var fieldOfView = 100.0; //Change the value
     var aspect = canvas.width / canvas.height;
     var zNear = 1; //Change the value
-    var zFar = 2000; //Change the value
+    var zFar = 100; //Change the value
     projectionMatrix = perspective(fieldOfView, aspect, zNear, zFar);
 
     //set the model-view matrix
@@ -374,6 +375,7 @@ window.onload = function init() {
         if (this.checked) {
             sizes[1] = document.getElementById("Cat").value;
         } else {
+            document.getElementById("Cow").value = element['Quantity'];
             sizes[1] = 0;
         }
     });
@@ -404,7 +406,7 @@ window.onload = function init() {
         ChickenValue.innerHTML = "(" + event.target.value + ")";
 
     };
-
+    
 
     $("#enableChicken").change(function () {
         if (this.checked) {
@@ -452,36 +454,70 @@ window.onload = function init() {
             switch (element['Animal Name']) {
                 case "Dog":
                     console.log('Dog', element['Quantity']);
+
+                    if( element['Quantity'] == 0){
+                        document.getElementById("enableDog").checked = false; 
+                    }else{
+
+                        document.getElementById("enableDog").checked = true; 
+                    }              
                     document.getElementById("Dog").value = element['Quantity'];
-                    sizes[0] = element['Quantity'];
+                    sizes[0]  = element['Quantity'];
                     DogValue.innerHTML = "(" + element['Quantity'] + ")";
                     break;
 
                 case "Cat":
                     console.log('Cat', element['Quantity']);
+       
+                    if( element['Quantity'] == 0){
+                        document.getElementById("enableCat").checked = false; 
+                    }else{
+    
+                        document.getElementById("enableCat").checked = true; 
+                    }
                     document.getElementById("Cat").value = element['Quantity'];
-                    sizes[1] = element['Quantity'];
+                    sizes[1]  = element['Quantity'];
                     CatValue.innerHTML = "(" + element['Quantity'] + ")";
                     break;
 
                 case "Cow":
                     console.log('Cow', element['Quantity']);
+
+                    if( element['Quantity'] == 0){
+                        document.getElementById("enableCow").checked = false; 
+                    }else{
+                        
+                        document.getElementById("enableCow").checked = true; 
+                    }
                     document.getElementById("Cow").value = element['Quantity'];
-                    sizes[2] = element['Quantity'];
+                    sizes[2]  = element['Quantity'];
                     CowValue.innerHTML = "(" + element['Quantity'] + ")";
                     break;
 
                 case "Chicken":
                     console.log('Chicken', element['Quantity']);
+
+                    if( element['Quantity'] == 0){
+                        document.getElementById("enableChicken").checked = false; 
+                    }else{
+                        
+                        document.getElementById("enableChicken").checked = true; 
+                    }
                     document.getElementById("Chicken").value = element['Quantity'];
-                    sizes[3] = element['Quantity'];
+                    sizes[3]  = element['Quantity'];
                     ChickenValue.innerHTML = "(" + element['Quantity'] + ")";
                     break;
 
                 case "Pig":
                     console.log('Pig', element['Quantity']);
+
+                    if( element['Quantity'] == 0){
+                        document.getElementById("enablePig").checked = false; 
+                    }else{
+                         document.getElementById("enablePig").checked = true; 
+                    }
                     document.getElementById("Pig").value = element['Quantity'];
-                    sizes[4] = element['Quantity'];
+                    sizes[4]  = element['Quantity'];
                     PigValue.innerHTML = "(" + element['Quantity'] + ")";
                     break;
             }
@@ -513,10 +549,8 @@ function render() {
     if (flag) {
         theta[axis] += 2.0; //Change the value
     }
-    //rotating the light
-    lightPosition[0] = 5.5 * Math.sin(0.02 * time);
-    lightPosition[2] = 5.5 * Math.cos(0.02 * time);
-    time += 2; //Change the value
+
+
     var image1 = document.getElementById("texImage")
     var image2 = document.getElementById("texImage1")
     var image3 = document.getElementById("texImage2")
@@ -531,7 +565,6 @@ function render() {
     //generate two cubes, one is closer to the viewer and the other farther from the viewer
     for (var index = 0; index < cubes.length; index++) {
 
-        gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
 
         viewMatrix = mult(modelViewMatrix, cubes[index]);
         if (sizes[index] > 0) {
@@ -548,12 +581,15 @@ function render() {
         var diffuseProduct = mult(lightDiffuse, materialDiffuse);
         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), diffuseProduct);
 
+      
+
         var ambientProduct = mult(lightAmbient, materialAmbient);
         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), ambientProduct);
 
         var specularProduct = mult(lightSpecular, materialSpecular);
         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), specularProduct);
-
+        
+        gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), lightPosition);
         gl.uniform1f(gl.getUniformLocation(program, "uShininess"), materialShininess);
         gl.uniform1i(gl.getUniformLocation(program, "uTextureMap"), index);
         gl.drawArrays(gl.TRIANGLES, 0, 36);
